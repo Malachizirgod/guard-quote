@@ -6,6 +6,7 @@ import Landing from "../pages/Landing";
 import Loading from "../components/Loading";
 import IndividualQuote from "../pages/IndividualQuote";
 import BusinessQuote from "../pages/BusinessQuote";
+import SecurityQuote from "../pages/SecurityQuote";
 import Report from "../pages/Report";
 import Dashboard from "../pages/Dashboard";
 import UserPortal from "../pages/UserPortal";
@@ -46,6 +47,15 @@ export default function AppRouter() {
         element={
           <PublicLayout>
             <BusinessQuote />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/quote/security"
+        element={
+          <PublicLayout>
+            <SecurityQuote />
           </PublicLayout>
         }
       />

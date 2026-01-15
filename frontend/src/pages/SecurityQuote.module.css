@@ -1,0 +1,245 @@
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.formSection {
+  flex: 1;
+  max-width: 500px;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #552583, #FDB927);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  opacity: 0.8;
+  margin-bottom: 2rem;
+}
+
+.form {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.field {
+  margin-bottom: 1.25rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 1rem;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: #FDB927;
+  box-shadow: 0 0 0 2px rgba(253, 185, 39, 0.2);
+}
+
+.field select option {
+  background: #1a1a2e;
+  color: white;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.checkboxRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: #FDB927;
+}
+
+.checkbox span {
+  opacity: 0.9;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #552583, #FDB927);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(253, 185, 39, 0.3);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #f44336;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+/* Results Section */
+.resultSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.quoteCard,
+.riskCard {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quoteCard h2,
+.riskCard h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #FDB927;
+}
+
+.priceMain {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 1rem 0;
+  background: linear-gradient(90deg, #fff, #FDB927);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.priceDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.priceDetails div {
+  display: flex;
+  justify-content: space-between;
+  opacity: 0.85;
+}
+
+.modelBadge {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: rgba(85, 37, 131, 0.3);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #FDB927;
+}
+
+.riskLevel {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.riskScore {
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+}
+
+.factorsList,
+.recommendationsList {
+  margin-top: 1rem;
+}
+
+.factorsList h3,
+.recommendationsList h3 {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.factorsList ul,
+.recommendationsList ul {
+  list-style: none;
+  padding: 0;
+}
+
+.factorsList li,
+.recommendationsList li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.factorsList li::before {
+  content: "⚠";
+  position: absolute;
+  left: 0;
+}
+
+.recommendationsList li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #4caf50;
+}
+
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .formSection {
+    max-width: 100%;
+  }
+}
