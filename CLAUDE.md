@@ -37,6 +37,7 @@ ML-powered security guard quoting system with PostgreSQL backend running on Rasp
 
 | Skill | Use When |
 |-------|----------|
+| `stack-2026.md` | 2026 best practices, Zod ingest, S2S auth, rate limiting |
 | `infrastructure.md` | SSH, credentials, server access |
 | `ml-pipeline.md` | Training data, ML workflow |
 | `ingest-spec.md` | Parsing Gemini/AI output |
@@ -47,6 +48,7 @@ ML-powered security guard quoting system with PostgreSQL backend running on Rasp
 | `troubleshooting.md` | Debugging issues |
 | `database.md` | Schema, queries, migrations |
 | `architecture.md` | Code structure, patterns |
+| `roadmap.md` | Project status, backlog, future vision |
 
 ### Key Locations
 

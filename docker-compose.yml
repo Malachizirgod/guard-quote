@@ -1,0 +1,240 @@
+# GuardQuote Docker Compose - Optimized for Raspberry Pi Cluster
+# Based on Gemini 2026 recommendations
+#
+# Usage:
+#   docker-compose up -d              # Start all services
+#   docker-compose logs -f backend    # View backend logs
+#   docker-compose ps                 # Check service status
+
+version: "3.8"
+
+services:
+  # ============================================
+  # BACKEND (Bun + Hono)
+  # ============================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: guardquote-backend:latest
+    container_name: gq-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://guardquote:${DB_PASSWORD}@db:5432/guardquote
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - ML_ENGINE_URL=http://ml-engine:8000
+      - ML_ENGINE_SECRET=${ML_ENGINE_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - guardquote
+
+  # ============================================
+  # ML ENGINE (FastAPI + scikit-learn)
+  # ============================================
+  ml-engine:
+    build:
+      context: ./ml-engine
+      dockerfile: Dockerfile
+    image: guardquote-ml:latest
+    container_name: gq-ml-engine
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ML_ENGINE_HOST=0.0.0.0
+      - ML_ENGINE_PORT=8000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=guardquote
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=guardquote
+      - ML_ENGINE_SECRET=${ML_ENGINE_SECRET}
+      - OMP_NUM_THREADS=1  # Prevents Python from choking Pi cores
+      - OPENBLAS_NUM_THREADS=1
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - ./ml-engine/models:/app/models:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - guardquote
+
+  # ============================================
+  # FRONTEND (React + Vite - Production Build)
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: guardquote-frontend:latest
+    container_name: gq-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - backend
+    networks:
+      - guardquote
+
+  # ============================================
+  # DATABASE (PostgreSQL 15)
+  # Note: For Pi deployment, mount SSD via USB 3.0
+  # ============================================
+  db:
+    image: postgres:15-alpine
+    container_name: gq-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=guardquote
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=guardquote
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U guardquote -d guardquote"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      # IMPORTANT: Mount to SSD, not SD card (per Gemini recommendation)
+      - postgres_data:/var/lib/postgresql/data
+      - ./ml-engine/data/seed_2026.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+    networks:
+      - guardquote
+
+  # ============================================
+  # REDIS (Sessions + Rate Limiting)
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: gq-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 128mb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - redis_data:/data
+    networks:
+      - guardquote
+
+  # ============================================
+  # TRAEFIK (API Gateway + TLS)
+  # ============================================
+  traefik:
+    image: traefik:v3.0
+    container_name: gq-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Dashboard
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # Uncomment for production TLS
+      # - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      # - "--certificatesresolvers.letsencrypt.acme.email=admin@guardquote.com"
+      # - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certs:/letsencrypt
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+    networks:
+      - guardquote
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  guardquote:
+    driver: bridge
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+  postgres_data:
+    # For Pi: Use external volume on SSD
+    # driver_opts:
+    #   type: none
+    #   device: /mnt/ssd/postgres
+    #   o: bind
+  redis_data:
+  traefik_certs:
