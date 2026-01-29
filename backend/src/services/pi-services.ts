@@ -201,20 +201,38 @@ async function getDockerStatus(containerName: string): Promise<Partial<ServiceSt
   return { status, uptime, memory, cpu };
 }
 
-// Demo mode mock statuses
+// Demo mode mock statuses - simulate realistic service states
 function getDemoServiceStatuses(): ServiceStatus[] {
-  return SERVICES.map((svc: any) => ({
-    name: svc.name,
-    displayName: svc.displayName,
-    description: svc.description,
-    type: svc.type,
-    port: svc.port,
-    status: svc.planned ? "planned" : "unknown",
-    uptime: svc.planned ? undefined : "Demo Mode",
-    memory: undefined,
-    cpu: undefined,
-    demoMode: true,
-  } as ServiceStatus));
+  // Simulate realistic statuses for demo
+  const demoStatuses: Record<string, { status: ServiceStatus["status"]; uptime?: string; memory?: string; cpu?: string }> = {
+    "postgresql": { status: "running", uptime: "5d 12h", memory: "256MB", cpu: "2.1%" },
+    "redis-server": { status: "running", uptime: "5d 12h", memory: "48MB", cpu: "0.5%" },
+    "pgbouncer": { status: "running", uptime: "5d 12h", memory: "12MB", cpu: "0.1%" },
+    "fail2ban": { status: "running", uptime: "5d 12h" },
+    "ufw": { status: "running", uptime: "5d 12h" },
+    "pihole-FTL": { status: "running", uptime: "5d 12h", memory: "64MB", cpu: "1.2%" },
+    "prometheus": { status: "running", uptime: "3d 8h", memory: "312MB", cpu: "3.4%" },
+    "grafana": { status: "running", uptime: "3d 8h", memory: "128MB", cpu: "1.8%" },
+    "alertmanager": { status: "stopped" },
+    "node-exporter": { status: "running", uptime: "3d 8h", memory: "24MB", cpu: "0.3%" },
+    "loki": { status: "running", uptime: "3d 8h", memory: "96MB", cpu: "1.1%" },
+    "promtail": { status: "running", uptime: "3d 8h", memory: "32MB", cpu: "0.4%" },
+  };
+
+  return SERVICES.map((svc: any) => {
+    const demo = demoStatuses[svc.name] || {};
+    return {
+      name: svc.name,
+      displayName: svc.displayName,
+      description: svc.description,
+      type: svc.type,
+      port: svc.port,
+      status: svc.planned ? "planned" : (demo.status || "running"),
+      uptime: demo.uptime,
+      memory: demo.memory,
+      cpu: demo.cpu,
+    } as ServiceStatus;
+  });
 }
 
 // Get all service statuses (parallel for speed)

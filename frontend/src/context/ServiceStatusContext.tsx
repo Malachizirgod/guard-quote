@@ -21,36 +21,22 @@ export function ServiceStatusProvider({ children }: { children: ReactNode }) {
   });
 
   const checkServices = async () => {
-    // Check ML Engine
     try {
-      const mlRes = await fetch("/ml/health", {
-        signal: AbortSignal.timeout(3000)
+      const res = await fetch("/api/status", {
+        signal: AbortSignal.timeout(5000)
       });
-      if (mlRes.ok) {
-        const data = await mlRes.json() as { status?: string };
-        setStatus(prev => ({
-          ...prev,
-          mlEngine: data?.status === "healthy" ? "online" : "offline"
-        }));
+      if (res.ok) {
+        const data = await res.json();
+        setStatus({
+          database: data.database?.connected ? "online" : "offline",
+          mlEngine: data.mlEngine?.connected ? "online" : "offline",
+          demoMode: data.mode === "demo",
+        });
       } else {
-        setStatus(prev => ({ ...prev, mlEngine: "offline" }));
+        setStatus({ database: "offline", mlEngine: "offline", demoMode: true });
       }
     } catch {
-      setStatus(prev => ({ ...prev, mlEngine: "offline" }));
-    }
-
-    // Check Backend/Database
-    try {
-      const dbRes = await fetch("/api/health", {
-        signal: AbortSignal.timeout(3000)
-      });
-      if (dbRes.ok) {
-        setStatus(prev => ({ ...prev, database: "online", demoMode: false }));
-      } else {
-        setStatus(prev => ({ ...prev, database: "offline", demoMode: true }));
-      }
-    } catch {
-      setStatus(prev => ({ ...prev, database: "offline", demoMode: true }));
+      setStatus({ database: "offline", mlEngine: "offline", demoMode: true });
     }
   };
 
