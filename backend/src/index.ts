@@ -33,6 +33,38 @@ app.get("/api/health", async (c) => {
   return c.json({ status: dbOk ? "healthy" : "degraded", database: dbOk ? "connected" : "disconnected", service: "GuardQuote API" });
 });
 
+// Environment status with async connection checks
+app.get("/api/status", async (c) => {
+  const dbUrl = process.env.DATABASE_URL || "";
+  const mlUrl = process.env.ML_ENGINE_URL || "http://localhost:8000";
+
+  // Check database
+  const dbOk = await testConnection();
+  const isLocalDb = dbUrl.includes("localhost") || dbUrl.includes("127.0.0.1") || !dbUrl.includes("192.168") && !dbUrl.includes("100.");
+
+  // Check ML engine
+  let mlOk = false;
+  let mlVersion = null;
+  try {
+    const mlRes = await fetch(`${mlUrl}/api/v1/health`, { signal: AbortSignal.timeout(3000) });
+    if (mlRes.ok) {
+      const mlData = await mlRes.json();
+      mlOk = mlData.model_loaded === true;
+      mlVersion = mlData.version;
+    }
+  } catch { mlOk = false; }
+
+  // Determine environment mode
+  const envMode = isLocalDb ? "demo" : "development";
+
+  return c.json({
+    mode: envMode,
+    database: { connected: dbOk, local: isLocalDb },
+    mlEngine: { connected: mlOk, version: mlVersion },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // ============================================
 // USERS
 // ============================================

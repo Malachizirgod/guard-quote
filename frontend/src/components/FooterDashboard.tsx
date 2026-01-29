@@ -1,4 +1,5 @@
 import styles from "./FooterDashboard.module.css";
+import StatusIndicator from "./StatusIndicator";
 
 export default function FooterDashboard() {
   return (
@@ -8,12 +9,7 @@ export default function FooterDashboard() {
         <span>Enterprise Security Intelligence</span>
       </div>
 
-      <nav>
-        <a href="#">Docs</a>
-        <a href="#">Support</a>
-        <a href="#">Security</a>
-        <a href="#">Status</a>
-      </nav>
+      <StatusIndicator />
 
       <span>© {new Date().getFullYear()}</span>
     </footer>

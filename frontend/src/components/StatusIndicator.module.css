@@ -1,0 +1,84 @@
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modeBadge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.modeBadge[data-mode="demo"] {
+  background: linear-gradient(135deg, #fdb927, #ff6b00);
+  color: #000;
+}
+
+.modeBadge[data-mode="development"] {
+  background: linear-gradient(135deg, #5f23ff, #00d4ff);
+  color: #fff;
+}
+
+.indicators {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  opacity: 0.85;
+  cursor: help;
+}
+
+.indicator:hover {
+  opacity: 1;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot.ok {
+  background: #4caf50;
+  box-shadow: 0 0 6px #4caf50;
+}
+
+.dot.error {
+  background: #f44336;
+  box-shadow: 0 0 6px #f44336;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.dot.loading {
+  background: #ffc107;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.allStatus {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.allStatus.ok {
+  color: #4caf50;
+}
+
+.allStatus.warn {
+  color: #ffc107;
+}

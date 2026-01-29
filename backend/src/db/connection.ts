@@ -1,10 +1,13 @@
 /**
  * PostgreSQL Connection using postgres.js
- * Connected to Raspberry Pi PostgreSQL
+ * Uses DATABASE_URL env var or falls back to local PostgreSQL
  */
 import postgres from "postgres";
 
-export const sql = postgres("postgres://guardquote:WPU8bj3nbwFyZFEtHZQz@192.168.2.70/guardquote", {
+const DATABASE_URL = process.env.DATABASE_URL ||
+  `postgres://${process.env.USER || 'postgres'}@localhost/guardquote_local`;
+
+export const sql = postgres(DATABASE_URL, {
   max: 5,
   idle_timeout: 20,
   connect_timeout: 10,
