@@ -28,10 +28,11 @@ export default function AdminLogin() {
   }, [location]);
 
   // Redirect if already logged in
-  if (isAuthenticated) {
-    navigate("/admin");
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/admin/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
