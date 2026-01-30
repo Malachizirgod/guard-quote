@@ -263,6 +263,28 @@ cd frontend && bun install
 
 ---
 
+## CI/CD
+
+GitHub Actions workflows in `.github/workflows/`:
+
+| Workflow | Trigger | Status |
+|----------|---------|--------|
+| `pr-check.yml` | Push/PR to main | ✅ Active |
+| `integration.yml` | Manual only | ⏸️ Disabled |
+
+**PR Check** runs on every push:
+- Backend: install, lint, typecheck
+- Frontend: install, lint, typecheck
+- ML Engine: install, lint, tests
+
+**Integration Tests** (disabled) require:
+- Self-hosted runner on local network
+- Access to Pi1 (192.168.2.70) for PostgreSQL/Redis
+
+To re-enable integration tests, uncomment the triggers in `integration.yml`.
+
+---
+
 ## Team
 
 Built for CIT 480 - California State University, Northridge
