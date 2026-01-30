@@ -21,10 +21,10 @@ jobs:
         run: cd backend && bun install --frozen-lockfile
 
       - name: Lint
-        run: cd backend && bun run lint || echo "Lint warnings (non-blocking)"
+        run: cd backend && bun run lint
 
       - name: Type check
-        run: cd backend && bun run typecheck || echo "Type check warnings (non-blocking)"
+        run: cd backend && bun run typecheck || echo "Type check warnings (TODO: fix strict types)"
 
   lint-frontend:
     runs-on: ubuntu-latest
@@ -40,10 +40,16 @@ jobs:
         run: cd frontend && bun install --frozen-lockfile
 
       - name: Lint
-        run: cd frontend && bun run lint || echo "Lint warnings (non-blocking)"
+        run: cd frontend && bun run lint
 
       - name: Type check
-        run: cd frontend && bun run typecheck || echo "Type check warnings (non-blocking)"
+        run: cd frontend && bun run typecheck
+
+      - name: Test
+        run: cd frontend && bun run test
+
+      - name: Build
+        run: cd frontend && bun run build
 
   test-ml-engine:
     runs-on: ubuntu-latest
@@ -53,17 +59,30 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: "3.12"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
           cd ml-engine
-          python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
       - name: Lint with ruff
-        run: cd ml-engine && ruff check . || echo "Lint warnings (non-blocking)"
+        run: cd ml-engine && ruff check .
 
       - name: Run tests
-        run: cd ml-engine && pytest tests/ -v --tb=short || echo "No tests or test failures (non-blocking)"
+        run: cd ml-engine && pytest tests/ -v --tb=short
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Frontend Docker image
+        run: docker build -t guardquote-frontend:test ./frontend
+
+      - name: Build Backend Docker image
+        run: docker build -t guardquote-backend:test ./backend
+
+      - name: Build ML Engine Docker image
+        run: docker build -t guardquote-ml:test ./ml-engine
