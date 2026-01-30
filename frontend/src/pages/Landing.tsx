@@ -14,15 +14,6 @@ export default function Landing() {
 
         <div className={styles.cardContainer}>
           <div className={styles.card}>
-            <h2>Security Guards</h2>
-            <p>ML-powered pricing for professional security services.</p>
-
-            <Link to="/quote/security" className={styles.btn}>
-              Get Security Quote
-            </Link>
-          </div>
-
-          <div className={styles.card}>
             <h2>For Individuals</h2>
             <p>Protect your home network with AI-driven recommendations.</p>
 
@@ -37,6 +28,15 @@ export default function Landing() {
 
             <Link to="/quote/business" className={styles.btn}>
               Request Business Quote
+            </Link>
+          </div>
+
+          <div className={styles.card}>
+            <h2>Security Guards</h2>
+            <p>ML-powered pricing for professional security services.</p>
+
+            <Link to="/quote/security" className={styles.btn}>
+              Get Security Quote
             </Link>
           </div>
         </div>
