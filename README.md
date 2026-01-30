@@ -1,189 +1,271 @@
 # GuardQuote
 
-Security guard service quoting platform with ML-powered pricing, real-time WebSocket updates, and automated CI/CD on Raspberry Pi cluster.
+AI-powered cybersecurity assessment platform that generates personalized security recommendations based on user risk profiles.
 
-## Features
-
-### Client-Facing
-- **Multi-step Quote Wizard** - Guided 4-step process for security quotes
-- **Live Price Updates** - WebSocket-powered real-time pricing as you type
-- **Draft Persistence** - Auto-saves progress to localStorage
-- **Risk Assessment** - ML-based risk scoring and pricing
-
-### Admin Dashboard
-- **Authentication** - JWT + refresh tokens with Argon2 password hashing
-- **User Management** - Create, edit, and manage admin users
-- **Service Management** - Compact LED-status view, click to manage services
-- **System Monitoring** - View Pi1 system info (load, memory, disk, temp)
-- **Dashboard Stats** - Overview of quotes, revenue, clients
-- **Automated Backups** - Daily PostgreSQL, Redis, and config backups
-
-### ML Engine
-- **Price Prediction** - Gradient Boosting model with 15 features
-- **Risk Classification** - 4-level risk assessment (low/medium/high/critical)
-- **2026 Pricing** - Updated event types and location modifiers
-- **Automated Training** - Weekly model retraining via GitHub Actions
-
-## Tech Stack
-
-| Component | Technology |
-|-----------|------------|
-| Backend | Bun 1.3 + Hono |
-| Frontend | React 19 + Vite + TypeScript |
-| Database | PostgreSQL 15 (on Raspberry Pi) |
-| Cache | Redis 7 |
-| Auth | JWT (HS256) + Argon2 |
-| Real-time | Native WebSocket |
-| ML Engine | Python 3.14 + FastAPI + scikit-learn |
-| Monitoring | Prometheus + Grafana + Loki |
-| CI/CD | GitHub Actions (self-hosted on Pi0) |
-
-## Infrastructure
-
-```
-┌─────────────────────┐         ┌─────────────────────┐
-│ Pi0 (192.168.2.101) │         │ Pi1 (192.168.2.70)  │
-│ GitHub Actions      │────────►│ PostgreSQL :5432    │
-│ Runner              │         │ Redis      :6379    │
-│                     │         │ PgBouncer  :6432    │
-│                     │         │ Prometheus :9090    │
-│                     │         │ Grafana    :3000    │
-└─────────────────────┘         └─────────────────────┘
-```
-
-## Quick Start
+## Quick Start (Clone & Go)
 
 ### Prerequisites
-- Bun 1.3+
-- Python 3.12+ (for ML engine)
-- Access to Pi1 (192.168.2.70) for database
 
-### Backend
+- **Node.js 18+** or **Bun 1.0+** (recommended)
+- **PostgreSQL 14+** (optional - runs in demo mode without it)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/jag18729/guard-quote.git
+cd guard-quote
+```
+
+### 2. Install Dependencies
+
+```bash
+# Backend
+cd backend
+bun install   # or: npm install
+
+# Frontend
+cd ../frontend
+bun install   # or: npm install
+```
+
+### 3. Set Up Environment
+
+```bash
+# Backend - copy example env
+cd backend
+cp .env.example .env
+```
+
+Edit `.env` if you have a database, or leave defaults for **Demo Mode**:
+
+```env
+# Demo Mode (no database required)
+DATABASE_URL=postgres://localhost/guardquote
+PORT=3000
+JWT_SECRET=dev-secret-change-in-production
+```
+
+### 4. Run the App
+
+**Terminal 1 - Backend:**
 ```bash
 cd backend
-bun install
-bun run --watch src/index.ts
+bun run dev   # or: npm run dev
 ```
-Runs at http://localhost:3000
 
-### Frontend
+**Terminal 2 - Frontend:**
 ```bash
 cd frontend
-bun install
-bun run dev
+bun run dev   # or: npm run dev
 ```
-Runs at http://localhost:5173
 
-### ML Engine
-```bash
-cd ml-engine
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-uvicorn src.main:app --reload --port 8000
+### 5. Open in Browser
+
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:3000
+- **Admin Panel:** http://localhost:5173/admin
+
+---
+
+## Demo Mode vs Live Mode
+
+The app shows a **status indicator** in the header:
+
+| Status | Meaning |
+|--------|---------|
+| 🟡 **Demo Mode** | No database connected - mock data used |
+| 🔵 **Local DB** | Connected to local PostgreSQL |
+| 🟢 **Live** | Connected to production database |
+
+**Demo Mode Features:**
+- Quote form submission works (stored in session)
+- Personalized reports generated from form data
+- Admin panel accessible with default credentials
+- No data persistence between sessions
+
+---
+
+## Default Login Credentials
+
 ```
+Email:    admin@guardquote.com
+Password: admin123
+```
+
+---
 
 ## Project Structure
 
 ```
 guard-quote/
 ├── backend/                 # Bun + Hono API
-│   └── src/
-│       ├── index.ts         # Server entry + routes
-│       ├── db/              # Database connection + schema
-│       └── services/        # Business logic
-├── frontend/                # React 19 + Vite
-│   └── src/
-│       ├── pages/           # Route components
-│       ├── layouts/         # Page layouts
-│       └── hooks/           # Custom hooks
-├── ml-engine/               # Python ML service
-│   ├── src/                 # FastAPI application
-│   ├── scripts/             # Training & data generation
-│   ├── models/trained/      # Serialized models
-│   └── data/                # Training data & SQL
-├── .github/workflows/       # CI/CD pipelines
-└── .claude/skills/          # Claude Code skills
+│   ├── src/
+│   │   ├── index.ts        # Main server & routes
+│   │   └── db/             # Database schema
+│   ├── .env.example        # Environment template
+│   └── package.json
+│
+├── frontend/               # React + Vite + TypeScript
+│   ├── src/
+│   │   ├── pages/          # Page components
+│   │   │   ├── IndividualQuote.tsx   # 4-step quote wizard
+│   │   │   ├── Report.tsx            # Personalized report
+│   │   │   └── admin/                # Admin pages
+│   │   ├── components/     # Reusable components
+│   │   ├── layouts/        # Page layouts
+│   │   ├── context/        # React context (auth)
+│   │   └── router/         # Route definitions
+│   └── package.json
+│
+└── ml-engine/              # Python ML service (optional)
+    └── ...
 ```
 
-## CI/CD
+---
 
-GitHub Actions workflows run on a self-hosted runner (Pi0):
+## Features
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `pr-check.yml` | PR/Push | Lint, type check |
-| `train-ml.yml` | Weekly/Manual | Retrain ML models |
-| `integration.yml` | Push to main | Test against Pi1 |
-| `test-runner.yml` | Manual | Verify runner setup |
+### Public Pages
+- **Landing Page** - Service overview with CTA
+- **Quote Wizard** - 4-step personalized assessment
+- **Security Report** - AI-generated recommendations based on:
+  - Current protection (antivirus, VPN, 2FA, etc.)
+  - Device count & usage patterns
+  - Work-from-home status
+  - Budget constraints
+  - Technical comfort level
 
-## ML Pipeline
+### Admin Dashboard
+- **Quote Requests** - View and manage submissions
+- **User Management** - Create admin accounts
+- **Status Overview** - Request pipeline visualization
+- **Quick Actions** - Common tasks
 
-### Generate Training Data
-```bash
-cd ml-engine
-source .venv/bin/activate
-python scripts/generate_training_data_2026.py
-```
+---
 
-### Train Models
-```bash
-python scripts/train_models.py
-```
+## Database Setup (Optional)
 
-### Current Model Performance
-- **Price R²:** 0.82
-- **Risk Accuracy:** 84%
-- **Training Records:** 1,100
+If you want data persistence, set up PostgreSQL:
 
-## API Overview
-
-### Authentication
-- `POST /api/auth/login` - Get JWT tokens
-- `POST /api/auth/refresh` - Refresh access token
-- `GET /api/auth/me` - Get current user
-
-### Quotes
-- `GET /api/quotes` - List quotes
-- `POST /api/quotes` - Create quote
-- `GET /api/quotes/:id` - Get quote details
-
-### ML Engine (port 8000)
-- `POST /api/v1/quote` - Generate ML quote
-- `POST /api/v1/risk-assessment` - Risk analysis
-- `GET /api/v1/event-types` - Available event types
-
-### WebSocket
-Connect to `ws://localhost:3000/ws` for real-time price updates.
-
-## Database
+### Local PostgreSQL
 
 ```bash
-# Connect to PostgreSQL
-psql postgresql://guardquote:WPU8bj3nbwFyZFEtHZQz@192.168.2.70:5432/guardquote
+# macOS
+brew install postgresql
+brew services start postgresql
+createdb guardquote
 
-# Key tables
-- users           # Authentication
-- quotes          # Quote records
-- event_types     # Event categories with pricing
-- locations       # ZIP-based location data
-- ml_training_data_2026  # ML training records
+# Run migrations
+cd backend
+psql -d guardquote -f src/db/schema.sql
 ```
 
-## Documentation
+Update `.env`:
+```env
+DATABASE_URL=postgres://localhost/guardquote
+```
 
-See `.claude/skills/` for detailed documentation:
-- `infrastructure.md` - Server details, credentials, SSH commands
-- `ml-pipeline.md` - ML training workflow
-- `github-actions.md` - CI/CD setup and workflows
-- `architecture.md` - Code structure, patterns
-- `troubleshooting.md` - Common issues and fixes
+### Docker (Alternative)
 
-## Admin Access
+```bash
+docker run -d \
+  --name guardquote-db \
+  -e POSTGRES_DB=guardquote \
+  -e POSTGRES_PASSWORD=password \
+  -p 5432:5432 \
+  postgres:15
 
-Default admin credentials:
-- Email: admin@guardquote.com
-- Password: admin123
+# Update .env
+DATABASE_URL=postgres://postgres:password@localhost:5432/guardquote
+```
+
+---
+
+## API Endpoints
+
+### Public
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| GET | `/api/status` | System status (mode, connections) |
+| POST | `/api/quote-requests` | Submit quote (creates user + request) |
+| POST | `/api/auth/login` | Login |
+| POST | `/api/auth/register` | User signup |
+
+### Admin (requires auth)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/stats` | Dashboard statistics |
+| GET | `/api/admin/quote-requests` | List all requests |
+| PATCH | `/api/admin/quote-requests/:id` | Update request status |
+| GET | `/api/admin/users` | List users |
+| POST | `/api/admin/users` | Create user |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 19, Vite, TypeScript, React Router |
+| Backend | Bun, Hono, PostgreSQL |
+| Auth | JWT (access + refresh tokens) |
+| Styling | CSS Modules |
+| Forms | React Hook Form |
+
+---
+
+## Development
+
+### Run Tests
+```bash
+cd backend && bun test
+cd frontend && bun test
+```
+
+### Build for Production
+```bash
+cd frontend && bun run build
+```
+
+### Environment Variables
+
+**Backend (.env):**
+```env
+DATABASE_URL=postgres://user:pass@host:5432/db
+PORT=3000
+JWT_SECRET=your-secret-key
+ML_ENGINE_URL=http://localhost:8000  # optional
+```
+
+---
+
+## Troubleshooting
+
+### "Cannot connect to database"
+- This is fine! The app runs in **Demo Mode** without a database
+- Check the status indicator in the header
+
+### "Port 3000 already in use"
+```bash
+lsof -ti :3000 | xargs kill -9
+```
+
+### "Module not found"
+```bash
+cd backend && bun install
+cd frontend && bun install
+```
+
+### Admin login not working
+- Use default credentials: `admin@guardquote.com` / `admin123`
+- Or check if database has the admin user seeded
+
+---
+
+## Team
+
+Built for CIT 480 - California State University, Northridge
 
 ## License
 

@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import StatusIndicator from "../components/StatusIndicator";
 import styles from "./AdminLayout.module.css";
 
 interface AdminLayoutProps {
@@ -85,6 +86,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <header className={styles.header}>
           <div className={styles.breadcrumb}>Admin Panel</div>
           <div className={styles.headerActions}>
+            <StatusIndicator />
             <NavLink to="/quote/security" className={styles.newQuoteBtn}>
               + New Quote
             </NavLink>

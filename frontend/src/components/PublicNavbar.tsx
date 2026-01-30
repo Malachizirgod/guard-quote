@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import StatusIndicator from "./StatusIndicator";
 import styles from "./PublicNavbar.module.css";
 
 export default function PublicNavbar() {
@@ -13,6 +14,9 @@ export default function PublicNavbar() {
         <span className={styles.logo}>GuardQuote</span>
         <span className={styles.tagline}>Security Intelligence</span>
       </div>
+
+      {/* CENTER - STATUS */}
+      <StatusIndicator compact />
 
       {/* RIGHT - AUTH */}
       <div className={styles.authGroup}>
