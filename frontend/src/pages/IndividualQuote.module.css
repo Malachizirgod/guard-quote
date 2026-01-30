@@ -414,6 +414,18 @@ textarea::placeholder {
   box-shadow: 0 0 25px rgba(253, 185, 39, 0.55);
 }
 
+/* ERROR MESSAGE */
+.errorMsg {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
 /* STEP INDICATOR */
 .stepIndicator {
   text-align: center;

@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import styles from "./IndividualQuote.module.css";
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 type FormData = {
   // Step 1: About You
   firstName: string;
@@ -95,12 +97,38 @@ export default function IndividualQuote() {
     }
   };
 
-  const onSubmit = (data: FormData) => {
-    console.log("Form data:", data);
-    navigate("/loading");
-    setTimeout(() => {
-      navigate("/report");
-    }, 3000);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const onSubmit = async (data: FormData) => {
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const res = await fetch(`${API_BASE}/api/quote-requests`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Failed to submit quote");
+      }
+
+      // Store the quote request ID for the report page
+      sessionStorage.setItem("quoteRequestId", result.quoteRequestId);
+      sessionStorage.setItem("quoteData", JSON.stringify(data));
+
+      navigate("/loading");
+      setTimeout(() => {
+        navigate("/report");
+      }, 3000);
+    } catch (err: any) {
+      setError(err.message);
+      setSubmitting(false);
+    }
   };
 
   const getBudgetLabel = (value: number) => {
@@ -396,10 +424,13 @@ export default function IndividualQuote() {
           )}
         </div>
 
+        {/* Error message */}
+        {error && <p className={styles.errorMsg}>{error}</p>}
+
         {/* Navigation */}
         <div className={styles.navigation}>
           {currentStep > 1 && (
-            <button type="button" className={styles.prevBtn} onClick={prevStep}>
+            <button type="button" className={styles.prevBtn} onClick={prevStep} disabled={submitting}>
               ← Previous
             </button>
           )}
@@ -408,8 +439,8 @@ export default function IndividualQuote() {
               Next →
             </button>
           ) : (
-            <button type="submit" className={styles.submitBtn}>
-              Get My Quote →
+            <button type="submit" className={styles.submitBtn} disabled={submitting}>
+              {submitting ? "Submitting..." : "Get My Quote →"}
             </button>
           )}
         </div>

@@ -873,6 +873,163 @@ app.post("/api/auth/register", async (c) => {
   }
 });
 
+// ============================================
+// INDIVIDUAL QUOTE REQUESTS (creates user + quote)
+// ============================================
+
+// Create quote_requests table if not exists
+sql`
+  CREATE TABLE IF NOT EXISTS quote_requests (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+
+    -- Contact info
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    home_type VARCHAR(50),
+    household_size VARCHAR(20),
+
+    -- Setup info
+    device_count VARCHAR(20),
+    primary_use VARCHAR(50),
+    works_from_home VARCHAR(20),
+    has_smart_home BOOLEAN DEFAULT false,
+    smart_home_details TEXT,
+
+    -- Security info
+    current_protection TEXT[], -- PostgreSQL array
+    past_incidents BOOLEAN DEFAULT false,
+    incident_details TEXT,
+    online_activity VARCHAR(50),
+    technical_comfort VARCHAR(50),
+
+    -- Needs
+    budget INT,
+    security_concerns TEXT,
+    urgency VARCHAR(50),
+    preferred_contact VARCHAR(20),
+
+    -- Status
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'quoted', 'accepted', 'rejected')),
+    admin_notes TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )
+`.catch(() => {}); // Ignore if exists
+
+// Submit individual quote (public - creates user + quote request)
+app.post("/api/quote-requests", async (c) => {
+  try {
+    const body = await c.req.json();
+    const { firstName, lastName, email, phone } = body;
+
+    if (!firstName || !lastName || !email) {
+      return c.json({ error: "Name and email are required" }, 400);
+    }
+
+    // Check if user exists
+    let userId: number;
+    const existingUser = await sql`SELECT id FROM users WHERE email = ${email.toLowerCase()} LIMIT 1`;
+
+    if (existingUser.length > 0) {
+      userId = existingUser[0].id;
+    } else {
+      // Create new user with random password (they can reset it later)
+      const tempPassword = crypto.randomUUID().slice(0, 12);
+      const passwordHash = await hashPassword(tempPassword);
+
+      const newUser = await sql`
+        INSERT INTO users (email, password_hash, first_name, last_name, role)
+        VALUES (${email.toLowerCase()}, ${passwordHash}, ${firstName}, ${lastName}, 'user')
+        RETURNING id
+      `;
+      userId = newUser[0].id;
+    }
+
+    // Create quote request
+    const quoteRequest = await sql`
+      INSERT INTO quote_requests (
+        user_id, first_name, last_name, email, phone, home_type, household_size,
+        device_count, primary_use, works_from_home, has_smart_home, smart_home_details,
+        current_protection, past_incidents, incident_details, online_activity, technical_comfort,
+        budget, security_concerns, urgency, preferred_contact
+      ) VALUES (
+        ${userId}, ${firstName}, ${lastName}, ${email.toLowerCase()}, ${phone || null},
+        ${body.homeType || null}, ${body.householdSize || null},
+        ${body.deviceCount || null}, ${body.primaryUse || null}, ${body.worksFromHome || null},
+        ${body.hasSmartHome || false}, ${body.smartHomeDetails || null},
+        ${body.currentProtection || []}, ${body.pastIncidents || false}, ${body.incidentDetails || null},
+        ${body.onlineActivity || null}, ${body.technicalComfort || null},
+        ${body.budget || null}, ${body.securityConcerns || null}, ${body.urgency || null},
+        ${body.preferredContact || 'email'}
+      )
+      RETURNING id
+    `;
+
+    return c.json({
+      success: true,
+      message: "Quote request submitted successfully",
+      quoteRequestId: quoteRequest[0].id,
+      userId
+    });
+  } catch (error: any) {
+    console.error("Quote request error:", error);
+    return c.json({ error: "Failed to submit quote request" }, 500);
+  }
+});
+
+// Admin: Get all quote requests
+app.get("/api/admin/quote-requests", async (c) => {
+  const auth = await requireAdmin(c);
+  if (auth instanceof Response) return auth;
+
+  const requests = await sql`
+    SELECT qr.*, u.email as user_email
+    FROM quote_requests qr
+    LEFT JOIN users u ON qr.user_id = u.id
+    ORDER BY qr.created_at DESC
+  `;
+  return c.json(requests);
+});
+
+// Admin: Get single quote request
+app.get("/api/admin/quote-requests/:id", async (c) => {
+  const auth = await requireAdmin(c);
+  if (auth instanceof Response) return auth;
+
+  const id = parseInt(c.req.param("id"));
+  const request = await sql`
+    SELECT qr.*, u.email as user_email
+    FROM quote_requests qr
+    LEFT JOIN users u ON qr.user_id = u.id
+    WHERE qr.id = ${id}
+  `;
+
+  return request.length ? c.json(request[0]) : c.json({ error: "Not found" }, 404);
+});
+
+// Admin: Update quote request status
+app.patch("/api/admin/quote-requests/:id", async (c) => {
+  const auth = await requireAdmin(c);
+  if (auth instanceof Response) return auth;
+
+  const id = parseInt(c.req.param("id"));
+  const body = await c.req.json();
+
+  await sql`
+    UPDATE quote_requests
+    SET status = COALESCE(${body.status ?? null}, status),
+        admin_notes = COALESCE(${body.adminNotes ?? null}, admin_notes),
+        updated_at = NOW()
+    WHERE id = ${id}
+  `;
+
+  return c.json({ success: true });
+});
+
 // Change password (authenticated)
 app.post("/api/auth/change-password", async (c) => {
   const authHeader = c.req.header("Authorization");

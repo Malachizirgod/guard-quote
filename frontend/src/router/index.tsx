@@ -22,6 +22,7 @@ import AdminLogin from "../pages/admin/AdminLogin";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminUsers from "../pages/admin/AdminUsers";
 import AdminServices from "../pages/admin/AdminServices";
+import AdminQuoteRequests from "../pages/admin/AdminQuoteRequests";
 
 export default function AppRouter() {
   return (
@@ -144,7 +145,7 @@ export default function AppRouter() {
         element={
           <AdminGuard>
             <AdminLayout>
-              <AdminQuotes />
+              <AdminQuoteRequests />
             </AdminLayout>
           </AdminGuard>
         }
@@ -187,15 +188,6 @@ export default function AppRouter() {
 }
 
 // Placeholder components for routes not yet created
-function AdminQuotes() {
-  return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Quote Management</h1>
-      <p style={{ color: "rgba(255,255,255,0.6)" }}>Coming soon - manage all quotes here</p>
-    </div>
-  );
-}
-
 function AdminClients() {
   return (
     <div style={{ padding: "2rem" }}>
