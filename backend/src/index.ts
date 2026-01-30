@@ -823,6 +823,56 @@ app.post("/api/auth/setup", async (c) => {
   return c.json({ success: true, message: "Admin user created" });
 });
 
+// Client registration (public sign up - creates 'client' role users)
+app.post("/api/auth/register", async (c) => {
+  try {
+    const { email, password, firstName, lastName, phone, companyName } = await c.req.json();
+
+    if (!email || !password || !firstName || !lastName) {
+      return c.json({ error: "Email, password, first name, and last name are required" }, 400);
+    }
+
+    // Check if email already exists
+    const existing = await sql`SELECT id FROM users WHERE email = ${email.toLowerCase()} LIMIT 1`;
+    if (existing.length > 0) {
+      return c.json({ error: "An account with this email already exists" }, 400);
+    }
+
+    // Hash password
+    const passwordHash = await hashPassword(password);
+
+    // Create user with 'client' role
+    const user = await sql`
+      INSERT INTO users (email, password_hash, first_name, last_name, role)
+      VALUES (${email.toLowerCase()}, ${passwordHash}, ${firstName}, ${lastName}, 'client')
+      RETURNING id, email, first_name, last_name, role
+    `;
+
+    // Optionally create a client record if company info provided
+    if (companyName) {
+      await sql`
+        INSERT INTO clients (company_name, contact_first_name, contact_last_name, email, phone)
+        VALUES (${companyName}, ${firstName}, ${lastName}, ${email.toLowerCase()}, ${phone || null})
+      `;
+    }
+
+    return c.json({
+      success: true,
+      message: "Account created successfully",
+      user: {
+        id: user[0].id,
+        email: user[0].email,
+        firstName: user[0].first_name,
+        lastName: user[0].last_name,
+        role: user[0].role
+      }
+    });
+  } catch (error: any) {
+    console.error("Registration error:", error);
+    return c.json({ error: "Registration failed. Please try again." }, 500);
+  }
+});
+
 // Change password (authenticated)
 app.post("/api/auth/change-password", async (c) => {
   const authHeader = c.req.header("Authorization");

@@ -42,7 +42,7 @@ export default function PublicNavbar() {
             </button>
             <button
               className={styles.signupBtn}
-              onClick={() => navigate("/admin/login")}
+              onClick={() => navigate("/signup")}
             >
               Sign Up
             </button>

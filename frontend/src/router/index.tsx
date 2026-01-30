@@ -14,6 +14,9 @@ import Report from "../pages/Report";
 import Dashboard from "../pages/Dashboard";
 import UserPortal from "../pages/UserPortal";
 
+// Auth pages
+import SignUp from "../pages/SignUp";
+
 // Admin pages
 import AdminLogin from "../pages/admin/AdminLogin";
 import AdminDashboard from "../pages/admin/AdminDashboard";
@@ -98,8 +101,9 @@ export default function AppRouter() {
         }
       />
 
-      {/* Admin Login (no auth required) */}
+      {/* Auth pages (no auth required) */}
       <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/signup" element={<SignUp />} />
 
       {/* Admin Protected Routes */}
       <Route

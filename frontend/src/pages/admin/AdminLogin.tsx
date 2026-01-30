@@ -92,6 +92,12 @@ export default function AdminLogin() {
         </form>
 
         <div className={styles.footer}>
+          <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem" }}>
+            Don't have an account?{" "}
+            <a href="/signup" style={{ color: "#FDB927" }}>
+              Sign Up
+            </a>
+          </span>
           <a href="/" className={styles.backLink}>
             ← Back to Home
           </a>
