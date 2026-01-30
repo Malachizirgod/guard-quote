@@ -108,8 +108,13 @@ export default function AdminUsers() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to save user");
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          throw new Error(data.error || "Failed to save user");
+        } catch {
+          throw new Error(text || "Failed to save user");
+        }
       }
 
       setShowModal(false);

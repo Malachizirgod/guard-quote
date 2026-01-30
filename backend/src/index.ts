@@ -946,20 +946,53 @@ app.post("/api/admin/users", async (c) => {
 
 // Admin: Update user
 app.patch("/api/admin/users/:id", async (c) => {
-  const auth = await requireAdmin(c);
-  if (auth instanceof Response) return auth;
-  const id = parseInt(c.req.param("id"));
-  const body = await c.req.json();
-  await sql`
-    UPDATE users
-    SET first_name = COALESCE(${body.firstName}, first_name),
-        last_name = COALESCE(${body.lastName}, last_name),
-        role = COALESCE(${body.role}, role),
-        is_active = COALESCE(${body.isActive}, is_active),
-        updated_at = NOW()
-    WHERE id = ${id}
-  `;
-  return c.json({ success: true });
+  try {
+    const auth = await requireAdmin(c);
+    if (auth instanceof Response) return auth;
+    const id = parseInt(c.req.param("id"));
+    const body = await c.req.json();
+
+    // Build update fields dynamically
+    const updates: string[] = [];
+    const values: any[] = [];
+
+    if (body.firstName !== undefined) {
+      updates.push(`first_name = $${updates.length + 1}`);
+      values.push(body.firstName);
+    }
+    if (body.lastName !== undefined) {
+      updates.push(`last_name = $${updates.length + 1}`);
+      values.push(body.lastName);
+    }
+    if (body.role !== undefined) {
+      updates.push(`role = $${updates.length + 1}`);
+      values.push(body.role);
+    }
+    if (body.isActive !== undefined) {
+      updates.push(`is_active = $${updates.length + 1}`);
+      values.push(body.isActive);
+    }
+
+    if (updates.length === 0) {
+      return c.json({ error: "No fields to update" }, 400);
+    }
+
+    updates.push("updated_at = NOW()");
+
+    await sql`
+      UPDATE users
+      SET first_name = COALESCE(${body.firstName ?? null}, first_name),
+          last_name = COALESCE(${body.lastName ?? null}, last_name),
+          role = COALESCE(${body.role ?? null}, role),
+          is_active = COALESCE(${body.isActive ?? null}, is_active),
+          updated_at = NOW()
+      WHERE id = ${id}
+    `;
+    return c.json({ success: true });
+  } catch (error: any) {
+    console.error("Update user error:", error);
+    return c.json({ error: error.message || "Failed to update user" }, 500);
+  }
 });
 
 // Admin: Delete user (soft delete)
