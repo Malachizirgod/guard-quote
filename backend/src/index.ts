@@ -841,10 +841,10 @@ app.post("/api/auth/register", async (c) => {
     // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Create user with 'client' role
+    // Create user with 'user' role (clients are regular users)
     const user = await sql`
       INSERT INTO users (email, password_hash, first_name, last_name, role)
-      VALUES (${email.toLowerCase()}, ${passwordHash}, ${firstName}, ${lastName}, 'client')
+      VALUES (${email.toLowerCase()}, ${passwordHash}, ${firstName}, ${lastName}, 'user')
       RETURNING id, email, first_name, last_name, role
     `;
 
@@ -924,7 +924,7 @@ app.get("/api/admin/users", async (c) => {
   const auth = await requireAdmin(c);
   if (auth instanceof Response) return auth;
   const users = await sql`
-    SELECT id, email, first_name, last_name, role, is_active, created_at, last_login
+    SELECT id, email, first_name, last_name, role, is_active, created_at, updated_at
     FROM users ORDER BY created_at DESC
   `;
   return c.json(users);
