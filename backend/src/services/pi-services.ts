@@ -7,24 +7,63 @@ const PI_HOST = process.env.PI_HOST || "192.168.2.70";
 const PI_USER = process.env.PI_USER || "johnmarston";
 const PI_PASS = process.env.PI_PASS || "481526";
 
-// Check if we're in demo mode (can't reach Pi)
+// Check if we're in demo mode (can't reach Pi or sshpass not installed)
 let demoMode: boolean | null = null;
 
 async function checkDemoMode(): Promise<boolean> {
   if (demoMode !== null) return demoMode;
 
+  // Force demo mode if DEMO_MODE env is set
+  if (process.env.DEMO_MODE === "true" || process.env.DEMO_MODE === "1") {
+    demoMode = true;
+    console.log("Pi1 services: DEMO mode (DEMO_MODE env set)");
+    return true;
+  }
+
+  // Check if sshpass is available
   try {
-    const proc = Bun.spawn(["ping", "-c", "1", "-W", "1", PI_HOST], {
+    const sshpassCheck = Bun.spawn(["which", "sshpass"], {
       stdout: "pipe",
       stderr: "pipe",
     });
+    const sshpassExit = await sshpassCheck.exited;
+    if (sshpassExit !== 0) {
+      demoMode = true;
+      console.log("Pi1 services: DEMO mode (sshpass not installed)");
+      return true;
+    }
+  } catch {
+    demoMode = true;
+    console.log("Pi1 services: DEMO mode (sshpass check failed)");
+    return true;
+  }
+
+  // Try actual SSH connection (not just ping)
+  try {
+    const proc = Bun.spawn([
+      "sshpass", "-p", PI_PASS,
+      "ssh",
+      "-o", "StrictHostKeyChecking=no",
+      "-o", "UserKnownHostsFile=/dev/null",
+      "-o", "ConnectTimeout=2",
+      "-o", "BatchMode=no",
+      `${PI_USER}@${PI_HOST}`,
+      "echo ok"
+    ], {
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+
+    const timeout = setTimeout(() => proc.kill(), 3000);
     const exitCode = await proc.exited;
+    clearTimeout(timeout);
+
     demoMode = exitCode !== 0;
   } catch {
     demoMode = true;
   }
 
-  console.log(`Pi1 services running in ${demoMode ? "DEMO" : "LIVE"} mode`);
+  console.log(`Pi1 services: ${demoMode ? "DEMO" : "LIVE"} mode`);
   return demoMode;
 }
 
