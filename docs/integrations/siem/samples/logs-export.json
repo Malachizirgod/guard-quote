@@ -1,0 +1,171 @@
+{
+  "export_info": {
+    "exported_at": "2026-02-06T21:39:00Z",
+    "source": "vandine-homelab",
+    "hosts": ["pi0", "pi1"],
+    "period": "24h sample"
+  },
+  "logs": [
+    {
+      "timestamp": "2026-02-06T08:15:22Z",
+      "host": "pi1",
+      "source": "auth",
+      "severity": "info",
+      "facility": "auth",
+      "message": "Accepted publickey for johnmarston from 192.168.2.80 port 54321 ssh2",
+      "fields": {
+        "user": "johnmarston",
+        "source_ip": "192.168.2.80",
+        "auth_method": "publickey",
+        "event_type": "ssh_login_success"
+      }
+    },
+    {
+      "timestamp": "2026-02-06T09:45:33Z",
+      "host": "pi1",
+      "source": "auth",
+      "severity": "warning",
+      "facility": "auth",
+      "message": "Failed password for invalid user admin from 203.0.113.45 port 44221 ssh2",
+      "fields": {
+        "user": "admin",
+        "source_ip": "203.0.113.45",
+        "auth_method": "password",
+        "event_type": "ssh_login_failed",
+        "invalid_user": true
+      }
+    },
+    {
+      "timestamp": "2026-02-06T08:32:01Z",
+      "host": "pi1",
+      "source": "auth",
+      "severity": "info",
+      "facility": "auth",
+      "message": "johnmarston : TTY=pts/0 ; PWD=/home/johnmarston ; USER=root ; COMMAND=/usr/bin/docker ps",
+      "fields": {
+        "user": "johnmarston",
+        "target_user": "root",
+        "command": "/usr/bin/docker ps",
+        "event_type": "sudo_command"
+      }
+    },
+    {
+      "timestamp": "2026-02-06T08:45:22Z",
+      "host": "pi1",
+      "source": "guardquote-api",
+      "severity": "warning",
+      "facility": "application",
+      "message": "Invalid credentials for user: hacker@evil.com",
+      "fields": {
+        "endpoint": "/api/auth/login",
+        "method": "POST",
+        "status_code": 401,
+        "email": "hacker@evil.com",
+        "event_type": "api_auth_failed"
+      }
+    },
+    {
+      "timestamp": "2026-02-06T09:15:33Z",
+      "host": "pi1",
+      "source": "guardquote-api",
+      "severity": "info",
+      "facility": "application",
+      "message": "Login: isaiah@guardquote.com (developer)",
+      "fields": {
+        "endpoint": "/api/auth/login",
+        "method": "POST",
+        "status_code": 200,
+        "email": "isaiah@guardquote.com",
+        "role": "developer",
+        "event_type": "api_auth_success"
+      }
+    },
+    {
+      "timestamp": "2026-02-06T13:00:22Z",
+      "host": "pi0",
+      "source": "ldap",
+      "severity": "info",
+      "facility": "auth",
+      "message": "BIND dn=\"cn=admin,dc=vandine,dc=us\" method=128",
+      "fields": {
+        "bind_dn": "cn=admin,dc=vandine,dc=us",
+        "method": "simple",
+        "event_type": "ldap_bind"
+      }
+    },
+    {
+      "timestamp": "2026-02-06T13:00:23Z",
+      "host": "pi0",
+      "source": "ldap",
+      "severity": "info",
+      "facility": "auth",
+      "message": "SRCH base=\"ou=People,dc=vandine,dc=us\" filter=\"(uid=isaiah)\"",
+      "fields": {
+        "search_base": "ou=People,dc=vandine,dc=us",
+        "filter": "(uid=isaiah)",
+        "results": 1,
+        "event_type": "ldap_search"
+      }
+    },
+    {
+      "timestamp": "2026-02-06T13:15:33Z",
+      "host": "pi1",
+      "source": "guardquote-api",
+      "severity": "warning",
+      "facility": "application",
+      "message": "Permission denied: users:delete for isaiah@guardquote.com",
+      "fields": {
+        "endpoint": "/api/admin/users/99",
+        "method": "DELETE",
+        "status_code": 403,
+        "email": "isaiah@guardquote.com",
+        "permission": "users:delete",
+        "event_type": "api_permission_denied"
+      }
+    },
+    {
+      "timestamp": "2026-02-06T14:00:35Z",
+      "host": "pi1",
+      "source": "guardquote-api",
+      "severity": "error",
+      "facility": "application",
+      "message": "Database connection timeout after 30000ms",
+      "fields": {
+        "endpoint": "/api/status",
+        "method": "GET",
+        "status_code": 500,
+        "response_time_ms": 30005,
+        "event_type": "database_error"
+      }
+    },
+    {
+      "timestamp": "2026-02-06T11:45:44Z",
+      "host": "pi1",
+      "source": "guardquote-api",
+      "severity": "info",
+      "facility": "application",
+      "message": "Restarted grafana on pi1 by admin@guardquote.vandine.us",
+      "fields": {
+        "endpoint": "/api/admin/infrastructure/pi1/grafana/restart",
+        "method": "POST",
+        "status_code": 200,
+        "service": "grafana",
+        "target_host": "pi1",
+        "actor": "admin@guardquote.vandine.us",
+        "event_type": "service_restart"
+      }
+    }
+  ],
+  "event_type_summary": {
+    "ssh_login_success": 4,
+    "ssh_login_failed": 5,
+    "sudo_command": 3,
+    "api_auth_success": 8,
+    "api_auth_failed": 4,
+    "api_permission_denied": 1,
+    "ldap_bind": 12,
+    "ldap_search": 25,
+    "database_error": 1,
+    "service_restart": 1
+  }
+}

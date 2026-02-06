@@ -1,0 +1,37 @@
+[Unit]
+Description=Vandine Log Shipper for SIEM Integration
+After=network.target nordvpnd.service
+Wants=nordvpnd.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+
+# Working directory
+WorkingDirectory=/opt/log-shipper
+
+# Start command
+ExecStart=/usr/bin/python3 /opt/log-shipper/log-shipper.py --config /etc/log-shipper/config.yaml
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/log /tmp
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=log-shipper
+
+[Install]
+WantedBy=multi-user.target

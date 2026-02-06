@@ -5,12 +5,16 @@ import AdminLayout from "./layouts/AdminLayout";
 import Landing from "./pages/Landing";
 import QuoteForm from "./pages/QuoteForm";
 import Login from "./pages/Login";
+import TechStack from "./pages/TechStack";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
 import Services from "./pages/admin/Services";
 import Logs from "./pages/admin/Logs";
 import QuoteRequests from "./pages/admin/QuoteRequests";
 import ML from "./pages/admin/ML";
+import Network from "./pages/admin/Network";
+import Blog from "./pages/admin/Blog";
+import Features from "./pages/admin/Features";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -29,6 +33,7 @@ export default function App() {
         <Route path="/quote" element={<QuoteForm />} />
         <Route path="/quote/:type" element={<QuoteForm />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/tech-stack" element={<TechStack />} />
       </Route>
       
       {/* Admin */}
@@ -39,6 +44,9 @@ export default function App() {
         <Route path="logs" element={<Logs />} />
         <Route path="quotes" element={<QuoteRequests />} />
         <Route path="ml" element={<ML />} />
+        <Route path="network" element={<Network />} />
+        <Route path="blog" element={<Blog />} />
+        <Route path="features" element={<Features />} />
       </Route>
     </Routes>
   );

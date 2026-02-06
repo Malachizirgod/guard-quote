@@ -1,0 +1,44 @@
+[2026-02-06T08:00:01.123Z] GET /api/status 200 - 5ms
+[2026-02-06T08:15:22.456Z] POST /api/auth/login 200 - 145ms
+[AUTH] Login: admin@guardquote.vandine.us (admin)
+[2026-02-06T08:15:25.789Z] GET /api/admin/stats 200 - 23ms
+[2026-02-06T08:16:01.234Z] GET /api/admin/users 200 - 18ms
+[2026-02-06T08:30:15.567Z] POST /api/quotes 201 - 89ms
+[QUOTE] Created: GQ-LX7K9M2 for client@example.com
+[2026-02-06T08:45:22.890Z] POST /api/auth/login 401 - 12ms
+[ERROR] Invalid credentials for user: hacker@evil.com
+[2026-02-06T08:45:23.123Z] POST /api/auth/login 401 - 8ms
+[ERROR] Invalid credentials for user: hacker@evil.com
+[2026-02-06T08:45:24.456Z] POST /api/auth/login 401 - 7ms
+[ERROR] Invalid credentials for user: hacker@evil.com
+[2026-02-06T09:00:01.789Z] GET /api/status 200 - 4ms
+[2026-02-06T09:15:33.012Z] POST /api/auth/login 200 - 132ms
+[AUTH] Login: isaiah@guardquote.com (developer)
+[2026-02-06T09:15:35.345Z] GET /api/admin/stats 200 - 21ms
+[2026-02-06T09:16:01.678Z] GET /api/features 200 - 15ms
+[2026-02-06T09:30:22.901Z] POST /api/features 201 - 45ms
+[FEATURE] Created: SIEM Dashboard Integration by isaiah@guardquote.com
+[2026-02-06T10:00:01.234Z] GET /api/status 200 - 5ms
+[2026-02-06T10:15:44.567Z] GET /api/blog 200 - 12ms
+[2026-02-06T10:30:15.890Z] POST /api/blog/posts 201 - 67ms
+[BLOG] Created post: 15 by admin@guardquote.vandine.us
+[2026-02-06T11:00:01.123Z] GET /api/status 200 - 4ms
+[2026-02-06T11:15:22.456Z] POST /api/auth/login 403 - 15ms
+[ERROR] Account disabled: suspended@guardquote.com
+[2026-02-06T11:30:33.789Z] GET /api/admin/infrastructure 200 - 234ms
+[2026-02-06T11:45:44.012Z] POST /api/admin/infrastructure/pi1/grafana/restart 200 - 3456ms
+[SERVICE] Restarted grafana on pi1 by admin@guardquote.vandine.us
+[2026-02-06T12:00:01.345Z] GET /api/status 200 - 5ms
+[2026-02-06T12:15:55.678Z] GET /api/admin/ml/status 200 - 45ms
+[2026-02-06T12:30:22.901Z] POST /api/admin/ml/retrain 200 - 12ms
+[ML] Retraining initiated by admin@guardquote.vandine.us
+[2026-02-06T13:00:01.234Z] GET /api/status 200 - 4ms
+[2026-02-06T13:15:33.567Z] DELETE /api/admin/users/99 403 - 8ms
+[ERROR] Permission denied: users:delete for isaiah@guardquote.com
+[2026-02-06T13:30:44.890Z] GET /api/admin/users/4/activity 200 - 34ms
+[2026-02-06T13:45:55.123Z] POST /api/auth/login 200 - 128ms
+[AUTH] Login: milkias@guardquote.com (developer)
+[2026-02-06T14:00:01.456Z] GET /api/status 200 - 5ms
+[ERROR] Database connection timeout after 30000ms
+[2026-02-06T14:00:35.789Z] GET /api/status 500 - 30005ms
+[2026-02-06T14:00:40.012Z] GET /api/status 200 - 6ms

@@ -1,0 +1,28 @@
+Feb  6 08:15:22 pi1 sshd[12341]: Accepted publickey for johnmarston from 192.168.2.80 port 54321 ssh2: RSA SHA256:aBcDeFgHiJkLmNoPqRsTuVwXyZ
+Feb  6 08:15:22 pi1 sshd[12341]: pam_unix(sshd:session): session opened for user johnmarston(uid=1000) by (uid=0)
+Feb  6 08:15:22 pi1 systemd-logind[456]: New session 15 of user johnmarston.
+Feb  6 08:32:01 pi1 sudo: johnmarston : TTY=pts/0 ; PWD=/home/johnmarston ; USER=root ; COMMAND=/usr/bin/docker ps
+Feb  6 08:32:01 pi1 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by johnmarston(uid=1000)
+Feb  6 08:32:01 pi1 sudo: pam_unix(sudo:session): session closed for user root
+Feb  6 09:45:33 pi1 sshd[12567]: Failed password for invalid user admin from 203.0.113.45 port 44221 ssh2
+Feb  6 09:45:35 pi1 sshd[12567]: Failed password for invalid user admin from 203.0.113.45 port 44221 ssh2
+Feb  6 09:45:37 pi1 sshd[12567]: Failed password for invalid user admin from 203.0.113.45 port 44221 ssh2
+Feb  6 09:45:37 pi1 sshd[12567]: Connection closed by invalid user admin 203.0.113.45 port 44221 [preauth]
+Feb  6 10:00:01 pi1 CRON[12890]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Feb  6 10:00:01 pi1 CRON[12890]: pam_unix(cron:session): session closed for user root
+Feb  6 10:15:44 pi1 sshd[13001]: Invalid user test from 198.51.100.23 port 55123
+Feb  6 10:15:44 pi1 sshd[13001]: Failed password for invalid user test from 198.51.100.23 port 55123 ssh2
+Feb  6 10:15:46 pi1 sshd[13001]: Connection closed by invalid user test 198.51.100.23 port 55123 [preauth]
+Feb  6 11:30:15 pi1 sshd[13245]: Accepted publickey for johnmarston from 100.64.0.1 port 45678 ssh2: ED25519 SHA256:xYzAbCdEfGhIjKlMnOpQrStUvWx
+Feb  6 11:30:15 pi1 sshd[13245]: pam_unix(sshd:session): session opened for user johnmarston(uid=1000) by (uid=0)
+Feb  6 12:00:01 pi1 CRON[13567]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Feb  6 12:15:22 pi1 sudo: johnmarston : TTY=pts/1 ; PWD=/home/johnmarston/guardquote-deno ; USER=root ; COMMAND=/usr/bin/systemctl restart guardquote
+Feb  6 12:45:33 pi0 sshd[8901]: Accepted password for rafaeljg from 192.168.2.80 port 56789 ssh2
+Feb  6 12:45:33 pi0 sshd[8901]: pam_unix(sshd:session): session opened for user rafaeljg(uid=1001) by (uid=0)
+Feb  6 13:00:22 pi0 slapd[1234]: conn=1001 op=0 BIND dn="cn=admin,dc=vandine,dc=us" method=128
+Feb  6 13:00:22 pi0 slapd[1234]: conn=1001 op=0 RESULT tag=97 err=0 text=
+Feb  6 13:00:23 pi0 slapd[1234]: conn=1001 op=1 SRCH base="ou=People,dc=vandine,dc=us" scope=2 deref=0 filter="(uid=isaiah)"
+Feb  6 13:00:23 pi0 slapd[1234]: conn=1001 op=1 SEARCH RESULT tag=101 err=0 nentries=1 text=
+Feb  6 13:15:00 pi1 sshd[14001]: Failed password for johnmarston from 192.168.2.99 port 60001 ssh2
+Feb  6 13:15:02 pi1 sshd[14001]: Failed password for johnmarston from 192.168.2.99 port 60001 ssh2
+Feb  6 13:15:04 pi1 sshd[14001]: Accepted password for johnmarston from 192.168.2.99 port 60001 ssh2

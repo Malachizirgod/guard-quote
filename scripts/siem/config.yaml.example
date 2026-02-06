@@ -1,0 +1,82 @@
+# Log Shipper Configuration
+# Copy to /etc/log-shipper/config.yaml and customize
+
+# Webhook endpoint for log delivery
+webhook_url: "https://your-siem.example.com/webhook/ingest"
+
+# Shared secret for HMAC signature (coordinate with SIEM admin)
+webhook_secret: "your-shared-secret-here"
+
+# Optional API key for additional authentication
+api_key: "your-api-key-here"
+
+# Source identifier
+source_name: "vandine-homelab"
+
+# Batch settings
+batch_size: 100              # Send when this many logs accumulated
+batch_timeout_seconds: 30    # Send after this many seconds regardless of batch size
+
+# Retry settings
+retry_count: 3
+retry_delay_seconds: 5
+
+# Log sources to monitor
+log_sources:
+  # System logs
+  - name: syslog
+    path: /var/log/syslog
+    enabled: true
+    host: pi0
+    fields:
+      log_type: system
+      environment: homelab
+
+  # Authentication logs
+  - name: auth
+    path: /var/log/auth.log
+    enabled: true
+    host: pi0
+    fields:
+      log_type: auth
+      environment: homelab
+
+  # LDAP logs
+  - name: ldap
+    path: /var/log/slapd.log
+    enabled: true
+    host: pi0
+    fields:
+      log_type: ldap
+      environment: homelab
+
+  # GuardQuote API logs
+  - name: guardquote-api
+    path: /tmp/gq.log
+    enabled: true
+    host: pi1
+    fields:
+      log_type: application
+      service: guardquote
+      environment: homelab
+
+  # Nginx access logs
+  - name: nginx-access
+    path: /var/log/nginx/access.log
+    enabled: true
+    host: pi1
+    fields:
+      log_type: http
+      service: nginx
+      environment: homelab
+
+  # Nginx error logs
+  - name: nginx-error
+    path: /var/log/nginx/error.log
+    enabled: true
+    host: pi1
+    fields:
+      log_type: http
+      severity: error
+      service: nginx
+      environment: homelab

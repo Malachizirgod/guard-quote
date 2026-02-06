@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { Shield, LayoutDashboard, Users, Server, ScrollText, FileText, LogOut, ExternalLink, Brain } from "lucide-react";
+import { Shield, LayoutDashboard, Users, Server, ScrollText, FileText, LogOut, ExternalLink, Brain, Network, Lightbulb } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 
@@ -17,7 +17,7 @@ export default function AdminLayout() {
   useEffect(() => {
     fetch("/api/status")
       .then(r => r.json())
-      .then(d => setSystemStatus(d.database?.connected ? "online" : "degraded"))
+      .then(d => setSystemStatus(d.database === "connected" || d.api === "healthy" ? "online" : "degraded"))
       .catch(() => setSystemStatus("offline"));
   }, []);
   
@@ -29,6 +29,9 @@ export default function AdminLayout() {
     { to: "/admin/ml", icon: Brain, label: "ML Engine" },
     { to: "/admin/users", icon: Users, label: "Users" },
     { to: "/admin/services", icon: Server, label: "Services" },
+    { to: "/admin/network", icon: Network, label: "Network" },
+    { to: "/admin/blog", icon: FileText, label: "Blog" },
+    { to: "/admin/features", icon: Lightbulb, label: "Features" },
     { to: "/admin/logs", icon: ScrollText, label: "Logs" },
   ];
   

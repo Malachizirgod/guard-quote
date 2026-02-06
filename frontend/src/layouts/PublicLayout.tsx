@@ -89,6 +89,7 @@ export default function PublicLayout() {
             <div className="flex gap-6">
               <a href="#" className="hover:text-zinc-400">Privacy</a>
               <a href="#" className="hover:text-zinc-400">Terms</a>
+              <Link to="/tech-stack" className="hover:text-accent">Tech Stack</Link>
               <Link to="/login" className="hover:text-zinc-400">Admin</Link>
             </div>
           </div>

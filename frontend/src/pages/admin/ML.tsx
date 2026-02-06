@@ -171,7 +171,7 @@ export default function ML() {
                       <span className="font-mono text-text-secondary">{et.event_type_code || "Unknown"}</span>
                       <div className="flex items-center gap-4">
                         <span className="text-text-muted">{et.count} records</span>
-                        <span className="font-mono">${parseFloat(et.avg_price || 0).toFixed(0)} avg</span>
+                        <span className="font-mono">${parseFloat(et.avg_price || 0).toLocaleString(undefined, {maximumFractionDigits: 0})} avg</span>
                       </div>
                     </div>
                   ))}
@@ -179,17 +179,12 @@ export default function ML() {
               </div>
               
               <div className="bg-surface border border-border rounded-lg p-5">
-                <h3 className="font-semibold mb-4">Data by Risk Zone</h3>
+                <h3 className="font-semibold mb-4">Data by State</h3>
                 <div className="space-y-2">
-                  {stats.byRiskZone?.map((rz: any) => (
-                    <div key={rz.risk_zone} className="flex items-center justify-between text-sm">
-                      <span className={`px-2 py-0.5 rounded text-xs ${rz.risk_zone === "high" ? "bg-critical/20 text-critical" : rz.risk_zone === "medium" ? "bg-warning/20 text-warning" : "bg-success/20 text-success"}`}>
-                        {rz.risk_zone || "Unknown"}
-                      </span>
-                      <div className="flex items-center gap-4">
-                        <span className="text-text-muted">{rz.count} records</span>
-                        <span className="font-mono">Risk: {parseFloat(rz.avg_risk || 0).toFixed(1)}</span>
-                      </div>
+                  {stats.byState?.slice(0, 8).map((s: any) => (
+                    <div key={s.state} className="flex items-center justify-between text-sm">
+                      <span className="font-mono text-text-secondary">{s.state || "Unknown"}</span>
+                      <span className="text-text-muted">{s.count} records</span>
                     </div>
                   ))}
                 </div>
