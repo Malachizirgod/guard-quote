@@ -84,7 +84,7 @@ Your Wazuh Manager
 │   pi0 (100.114.94.18)                 │
 │   └─ Wazuh Agent → logs, FIM, etc.    │
 │                                        │
-│   pi1 (100.66.167.62)                 │
+│   pi1 (100.77.26.41)                 │
 │   └─ Wazuh Agent → logs, FIM, etc.    │
 │                                        │
 │   PA-220, UDM (network devices)       │

@@ -36,3 +36,4 @@ drizzle/
 # Models (trained ML models can be large)
 ml-engine/models/trained/*.pkl
 ml-engine/models/trained/*.joblib
+frontend/.wrangler/

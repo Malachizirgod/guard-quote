@@ -101,7 +101,7 @@ We moved **off AWS entirely**. New architecture:
 | Host | IP | Tailscale IP | Role |
 |------|-----|--------------|------|
 | pi0 | 192.168.2.101 | 100.114.94.18 | LDAP, Logs, Vector |
-| pi1 | 192.168.2.70 | 100.66.167.62 | API, Grafana, Prometheus |
+| pi1 | 192.168.2.70 | 100.77.26.41 | API, Grafana, Prometheus |
 | ThinkStation | 192.168.2.80 | 100.126.232.42 | Development |
 
 ### Wazuh SIEM Integration

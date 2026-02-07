@@ -34,7 +34,7 @@ const infrastructure = {
     nodes: [
       { name: "thinkstation", ip: "100.126.232.42", status: "online" },
       { name: "pi0", ip: "100.114.94.18", status: "online" },
-      { name: "pi1", ip: "100.66.167.62", status: "offline" },
+      { name: "pi1", ip: "100.77.26.41", status: "online" },
       { name: "macintosh-5", ip: "100.120.179.63", status: "offline" },
     ],
   },
@@ -66,7 +66,7 @@ const infrastructure = {
       os: "Ubuntu 25.10",
       arch: "aarch64",
       localIp: "192.168.2.70",
-      tailscaleIp: "100.66.167.62",
+      tailscaleIp: "100.77.26.41",
       sshUser: "johnmarston",
       services: [
         { name: "GuardQuote API", port: 3002, status: "running" },
@@ -419,7 +419,7 @@ export default function NetworkPage() {
                 {[
                   { name: "thinkstation", ip: "100.126.232.42", status: "online" },
                   { name: "pi0", ip: "100.114.94.18", status: "online" },
-                  { name: "pi1", ip: "100.66.167.62", status: "offline" },
+                  { name: "pi1", ip: "100.77.26.41", status: "online" },
                   { name: "macintosh-5", ip: "100.120.179.63", status: "offline" },
                 ].map((node, i) => (
                   <div key={i} className={`p-2 rounded text-center text-xs ${
@@ -473,7 +473,7 @@ export default function NetworkPage() {
                   <div className="flex justify-between"><span>SNMP Exp</span><span className="text-green-400">:9116</span></div>
                 </div>
                 <div className="mt-2 pt-2 border-t border-border">
-                  <div className="text-xs text-purple-400 font-mono">ts: 100.66.167.62</div>
+                  <div className="text-xs text-purple-400 font-mono">ts: 100.77.26.41</div>
                 </div>
               </div>
 
@@ -597,7 +597,7 @@ export default function NetworkPage() {
                 <div className="space-y-1 font-mono text-sm">
                   <div className="flex justify-between"><span>thinkstation</span><span className="text-purple-400">100.126.232.42</span></div>
                   <div className="flex justify-between"><span>pi0</span><span className="text-purple-400">100.114.94.18</span></div>
-                  <div className="flex justify-between"><span>pi1</span><span className="text-text-muted">100.66.167.62 (offline)</span></div>
+                  <div className="flex justify-between"><span>pi1</span><span className="text-text-muted">100.77.26.41</span></div>
                 </div>
               </div>
             </div>

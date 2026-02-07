@@ -94,7 +94,7 @@ snmp-pa220          # Query PA-220 (SNMPv2c)
 | Host | Local IP | Tailscale | Services |
 |------|----------|-----------|----------|
 | pi0 | 192.168.2.101 | 100.114.94.18 | LDAP, Vector, rsyslog |
-| pi1 | 192.168.2.70 | 100.66.167.62 | API, Grafana, Prometheus, PostgreSQL |
+| pi1 | 192.168.2.70 | 100.77.26.41 | API, Grafana, Prometheus, PostgreSQL |
 | UDM | 192.168.2.1 | - | Router, DHCP |
 | PA-220 | 192.168.2.14 | - | Firewall |
 

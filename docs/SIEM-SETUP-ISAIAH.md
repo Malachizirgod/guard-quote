@@ -70,7 +70,7 @@ Generate on the Wazuh manager:
 
 # Repeat for pi1
 # Agent name: pi1  
-# Agent IP: any (or 100.66.167.62)
+# Agent IP: any (or 100.77.26.41)
 ```
 
 Provide two keys:
@@ -147,7 +147,7 @@ encoding.codec = "json"
 ## Tailscale Network
 
 Both sides need Tailscale:
-- **Our side**: pi0 (100.114.94.18), pi1 (100.66.167.62)
+- **Our side**: pi0 (100.114.94.18), pi1 (100.77.26.41)
 - **Isaiah's side**: His Wazuh manager
 
 Benefits:
