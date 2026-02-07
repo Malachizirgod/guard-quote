@@ -323,8 +323,8 @@ const initialNodes: Node[] = [
       throughput: 'Pending setup',
       details: {
         type: 'Wazuh 4.x',
-        location: 'TBD (Tailscale)',
-        features: ['FIM', 'Rootkit detection', 'Vulnerability scan'],
+        location: 'Tailscale mesh',
+        features: ['FIM', 'Rootkit detection', 'Vulnerability scan', 'IDS/IPS'],
         agents: ['pi0 (pending)', 'pi1 (pending)'],
         owner: 'Isaiah Bernal',
       }
