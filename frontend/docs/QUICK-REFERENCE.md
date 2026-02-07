@@ -4,19 +4,21 @@
 - **App**: https://guardquote.vandine.us
 - **Login**: https://guardquote.vandine.us/login
 - **Admin**: https://guardquote.vandine.us/admin
+- **Grafana**: https://grafana.vandine.us
 
 ## Default Admin
-- Email: johnmarston@vandine.us
-- Password: (ask John)
+- Email: admin@guardquote.vandine.us
+- Password: admin123
 
 ## Navigation
 | Key | Section |
 |-----|---------|
-| `D` | Dashboard |
-| `Q` | Quote Requests |
-| `U` | Users |
-| `S` | Services |
-| `L` | Logs |
+| Dashboard | Overview stats |
+| Users | Team management (RBAC) |
+| Blog | Posts + comments |
+| Features | Feature requests + voting |
+| Network | Topology + data pipeline |
+| Services | Infrastructure status |
 
 ## Quote Status Flow
 ```
@@ -24,23 +26,26 @@ Pending → In Review → Quoted → Closed
 ```
 
 ## Quick Commands (SSH to pi1)
+
 ```bash
-# Check backend status
-sudo systemctl status guardquote
+# Check Deno API status
+pgrep -f "deno run" && echo "Running" || echo "Stopped"
 
 # View logs
-sudo journalctl -u guardquote -f
+tail -f /tmp/gq.log
 
-# Restart backend
-sudo systemctl restart guardquote
+# Restart API
+pkill -f "deno run"
+cd ~/guardquote-deno && nohup deno run -A server.ts > /tmp/gq.log 2>&1 &
 
 # Check database
-psql -U guardquote -d guardquote -c "SELECT COUNT(*) FROM quotes;"
+PGPASSWORD=guardquote123 psql -h 127.0.0.1 -U postgres -d guardquote -c "SELECT COUNT(*) FROM quotes;"
 ```
 
-## Emergency Contacts
-- John: john@vandine.us
-- Slack: #guardquote-ops
+## Team Contacts
+- Rafa (Lead Dev): rafael.garcia.contact.me@gmail.com
+- GitHub: https://github.com/jag18729/guard-quote
+- Project Board: https://github.com/users/jag18729/projects/1
 
 ---
 *Print this and keep at your desk*

@@ -1,4 +1,4 @@
-# GuardQuote
+# GuardQuote Frontend
 
 ML-powered security service pricing platform. Built with React + TypeScript + TailwindCSS.
 
@@ -11,7 +11,7 @@ ML-powered security service pricing platform. Built with React + TypeScript + Ta
 ```bash
 # Clone the repo
 git clone https://github.com/jag18729/guard-quote.git
-cd guard-quote
+cd guard-quote/frontend
 
 # Install dependencies
 npm install
@@ -31,24 +31,23 @@ npm run build
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         CLOUDFLARE EDGE                             │
 │  ┌─────────────┐  ┌─────────────────┐  ┌─────────────────────────┐ │
-│  │  Zero Trust │  │ guardquote-     │  │    vandine-tunnel       │ │
-│  │   Access    │  │ gateway Worker  │  │  (Cloudflare Tunnel)    │ │
-│  │ (email auth)│  │ (rate limiting) │  │                         │ │
+│  │  Zero Trust │  │   Pages (CDN)   │  │    vandine-tunnel       │ │
+│  │   Access    │  │   Frontend      │  │  (Cloudflare Tunnel)    │ │
+│  │ (email OTP) │  │   Static Files  │  │                         │ │
 │  └──────┬──────┘  └────────┬────────┘  └────────────┬────────────┘ │
 └─────────┼──────────────────┼───────────────────────┼───────────────┘
           │                  │                        │
           ▼                  ▼                        ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         PI1 (Services Host)                         │
+│                         PI1 (192.168.2.70)                          │
 │                                                                     │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌───────────┐ │
-│  │   nginx     │  │ GuardQuote  │  │ PostgreSQL  │  │   Redis   │ │
-│  │   :80       │  │ API :3002   │  │   :5432     │  │   :6379   │ │
-│  │ (frontend)  │  │ (Node.js)   │  │             │  │           │ │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └───────────┘ │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                 │
+│  │ GuardQuote  │  │ PostgreSQL  │  │  Grafana    │                 │
+│  │ API :3002   │  │   :5432     │  │   :3000     │                 │
+│  │ (Deno)      │  │             │  │             │                 │
+│  └─────────────┘  └─────────────┘  └─────────────┘                 │
 │                                                                     │
-│  Frontend: /var/www/guardquote/                                     │
-│  Backend:  ~/guard-quote/backend/                                   │
+│  Backend: ~/guardquote-deno/server.ts                               │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -58,25 +57,28 @@ npm run build
 
 ```
 src/
+├── components/
+│   └── DataFlowDiagram.tsx   # Interactive React Flow diagram
 ├── context/
-│   └── AuthContext.tsx      # Authentication state management
+│   └── AuthContext.tsx       # Authentication state management
 ├── layouts/
-│   ├── AdminLayout.tsx      # Admin dashboard shell + sidebar
-│   └── PublicLayout.tsx     # Public pages header/footer
+│   ├── AdminLayout.tsx       # Admin dashboard shell + sidebar
+│   └── PublicLayout.tsx      # Public pages header/footer
 ├── pages/
-│   ├── Landing.tsx          # Public homepage
-│   ├── QuoteForm.tsx        # Quote wizard (4 steps)
-│   ├── Login.tsx            # Admin login
+│   ├── Landing.tsx           # Public homepage
+│   ├── QuoteForm.tsx         # Quote wizard
+│   ├── Login.tsx             # Admin login
 │   └── admin/
-│       ├── Dashboard.tsx    # Overview stats
-│       ├── QuoteRequests.tsx # Manage quotes
-│       ├── ML.tsx           # ML model management
-│       ├── Users.tsx        # User management
-│       ├── Services.tsx     # System services
-│       └── Logs.tsx         # Request logs
-├── App.tsx                  # Router configuration
-├── main.tsx                 # Entry point
-└── index.css                # Tailwind + custom styles
+│       ├── Dashboard.tsx     # Overview stats
+│       ├── Users.tsx         # User management (RBAC)
+│       ├── Blog.tsx          # Blog posts
+│       ├── Features.tsx      # Feature requests + voting
+│       ├── Network.tsx       # Topology + data pipeline
+│       ├── Services.tsx      # Infrastructure status
+│       └── ML.tsx            # ML model management
+├── App.tsx                   # Router configuration
+├── main.tsx                  # Entry point
+└── index.css                 # Tailwind + custom styles
 ```
 
 ---
@@ -89,11 +91,11 @@ src/
 | **Styling** | TailwindCSS 3.4 |
 | **Routing** | React Router 7 |
 | **Icons** | Lucide React |
-| **Animations** | Framer Motion |
-| **Backend** | Node.js + Hono (on Pi1) |
-| **Database** | PostgreSQL |
-| **Auth** | Cloudflare Zero Trust Access |
-| **CDN/Security** | Cloudflare Tunnel + Workers |
+| **Diagrams** | React Flow (@xyflow/react) |
+| **Backend** | Deno 2.6 + Hono (on pi1) |
+| **Database** | PostgreSQL 16 |
+| **Auth** | bcrypt + JWT |
+| **Hosting** | Cloudflare Pages |
 
 ---
 
@@ -115,27 +117,15 @@ src/
 
 The frontend connects to the backend API at `/api/*`. In development, requests proxy to the production API through Vite.
 
-**vite.config.ts** handles the proxy:
-```ts
-server: {
-  proxy: {
-    '/api': 'https://guardquote.vandine.us'
-  }
-}
-```
-
 ---
 
 ## Deployment
 
-### Manual Deploy (from ThinkStation)
+### Deploy to Cloudflare Pages
 
 ```bash
-# Build
 npm run build
-
-# Deploy to Pi1
-scp -r dist/* pi1:/var/www/guardquote/
+npx wrangler pages deploy dist --project-name=guardquote
 ```
 
 ### CI/CD
@@ -144,93 +134,53 @@ GitHub Actions runs on every push:
 1. **lint-and-build** - TypeScript check + Vite build
 2. **test** - Run tests (if present)
 
-Branch protection requires CI to pass before merging.
-
----
-
-## API Endpoints
-
-### Public
-| Endpoint | Description |
-|----------|-------------|
-| `POST /api/predict` | Get price prediction |
-| `POST /api/auth/login` | Admin login |
-| `GET /api/health` | Health check |
-
-### Admin (requires auth)
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/admin/stats` | Dashboard statistics |
-| `GET /api/admin/quote-requests` | List all quotes |
-| `GET /api/admin/users` | List admin users |
-| `GET /api/admin/services` | System services |
-| `GET /api/admin/ml/status` | ML model status |
-| `GET /api/admin/ml/training-data` | Training dataset |
-| `POST /api/admin/ml/rollback` | Rollback model version |
-| `POST /api/admin/ml/retrain` | Trigger retraining |
-
 ---
 
 ## Admin Access
 
 **URL:** https://guardquote.vandine.us/admin
 
-1. Click "Admin Login" in header
-2. Enter credentials
-3. Cloudflare Access will verify your email
-
-**Test Account:**
-- Email: johnmarston@vandine.us
-- Password: (ask John)
+**Credentials:**
+- Email: admin@guardquote.vandine.us
+- Password: admin123
 
 ---
 
 ## Key Features
 
 ### For Clients (Public)
-- 🏠 Landing page with testimonials/FAQ
-- 📝 4-step quote wizard
+- 🏠 Landing page with orange/black theme
+- 📝 Quote wizard
 - 💰 Instant price estimates
 
 ### For Admins
 - 📊 Dashboard with stats
-- 📋 Quote request management
-- 🧠 ML model monitoring & rollback
-- 👥 User management
+- 👥 User management (RBAC)
+- ✍️ Blog with comments
+- 🗳️ Feature requests with voting + GitHub sync
+- 🌐 Network topology diagram
+- 📈 Interactive data pipeline visualization
 - 🔧 Service monitoring
-- 📜 Request logs
 
 ---
 
-## Teammate Guide
+## Contributing
 
-### Getting Started
 1. Clone repo and run `npm install`
 2. Create a feature branch: `git checkout -b feature/your-feature`
 3. Make changes
 4. Push and create PR
-5. Wait for John's approval + CI pass
+5. Wait for approval + CI pass
 
-### Do's ✅
-- Follow existing code patterns
-- Use TypeScript strict mode
-- Use TailwindCSS for styling
-- Write clear commit messages
-- Test your changes locally
-
-### Don'ts ❌
-- Push directly to `master`
-- Change auth/security code without discussion
-- Modify CI configuration
-- Add new dependencies without approval
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ---
 
-## Contact
+## Team
 
-- **Project Lead:** John (john@vandine.us)
+- **Lead Dev:** Rafa (rafael.garcia.contact.me@gmail.com)
 - **Repo:** https://github.com/jag18729/guard-quote
-- **Production:** https://guardquote.vandine.us
+- **Project Board:** https://github.com/users/jag18729/projects/1
 
 ---
 

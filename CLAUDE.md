@@ -1,169 +1,141 @@
 # GuardQuote - Claude Code Context
 
 ## Project Overview
-ML-powered security guard quoting system with PostgreSQL backend running on Raspberry Pi cluster.
+ML-powered insurance quoting platform. Self-hosted on Raspberry Pi cluster with Cloudflare edge.
+
+**Live Site:** https://guardquote.vandine.us  
+**GitHub:** https://github.com/jag18729/guard-quote  
+**Project Board:** https://github.com/users/jag18729/projects/1
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Development Machine                                                     │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                      │
-│  │ Frontend    │  │ Backend     │  │ ML Engine   │                      │
-│  │ React 19    │  │ Bun + Hono  │  │ FastAPI     │                      │
-│  │ :5173       │  │ :3000       │  │ :8000       │                      │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                      │
-└─────────┼────────────────┼────────────────┼─────────────────────────────┘
-          │                │                │
-          └────────────────┴────────────────┘
-                           │
-          ┌────────────────┴────────────────┐
-          ▼                                 ▼
-┌─────────────────────┐         ┌─────────────────────┐
-│ Pi0 (192.168.2.101) │         │ Pi1 (192.168.2.70)  │
-│ ┌─────────────────┐ │         │ ┌─────────────────┐ │
-│ │ GitHub Actions  │ │────────►│ │ PostgreSQL:5432 │ │
-│ │ Runner          │ │         │ │ Redis:6379      │ │
-│ │                 │ │         │ │ PgBouncer:6432  │ │
-│ │ User: rafaeljg  │ │         │ │ Prometheus:9090 │ │
-│ └─────────────────┘ │         │ │ Grafana:3000    │ │
-└─────────────────────┘         │ │ Loki:3100       │ │
-                                └─────────────────────┘
+│                         CLOUDFLARE EDGE                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                   │
+│  │    Pages     │  │   Workers    │  │    Tunnel    │                   │
+│  │  (Frontend)  │  │  (Gateway)   │  │   (Origin)   │                   │
+│  └──────────────┘  └──────────────┘  └──────────────┘                   │
+└─────────────────────────────┬───────────────────────────────────────────┘
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+┌─────────────────────────┐     ┌─────────────────────────┐
+│ pi0 (192.168.2.101)     │     │ pi1 (192.168.2.70)      │
+│ ┌─────────────────────┐ │     │ ┌─────────────────────┐ │
+│ │ Vector (logs)       │ │────►│ │ Deno API :3002      │ │
+│ │ LDAP :389           │ │     │ │ PostgreSQL :5432    │ │
+│ │ Syslog aggregation  │ │     │ │ Grafana :3000       │ │
+│ │ Cloudflared         │ │     │ │ Prometheus :9090    │ │
+│ └─────────────────────┘ │     │ │ Loki :3100          │ │
+└─────────────────────────┘     │ │ Cloudflared         │ │
+                                └─────────────────────────┘
 ```
 
-## Quick Reference
+## Tech Stack
 
-### Skills (in `.claude/skills/`)
+| Component | Technology |
+|-----------|------------|
+| Frontend | React 18 + TypeScript + Vite + Tailwind |
+| Backend | Deno 2.6 + Hono |
+| Database | PostgreSQL 16 |
+| Auth | bcrypt + JWT (djwt) |
+| Hosting | Cloudflare Pages + Tunnel |
+| Monitoring | Grafana + Prometheus + Loki |
+| Diagrams | React Flow (@xyflow/react) |
 
-| Skill | Use When |
-|-------|----------|
-| `stack-2026.md` | 2026 best practices, Zod ingest, S2S auth, rate limiting |
-| `infrastructure.md` | SSH, credentials, server access |
-| `ml-pipeline.md` | Training data, ML workflow |
-| `ingest-spec.md` | Parsing Gemini/AI output |
-| `generate-data.md` | Creating training records |
-| `train-model.md` | Training ML models |
-| `github-actions.md` | CI/CD workflows |
-| `runner-setup.md` | Pi0 GitHub runner setup |
-| `troubleshooting.md` | Debugging issues |
-| `database.md` | Schema, queries, migrations |
-| `architecture.md` | Code structure, patterns |
-| `roadmap.md` | Project status, backlog, future vision |
-
-### Key Locations
+## Key Locations
 
 | What | Where |
 |------|-------|
-| Backend API | `backend/src/index.ts` |
 | Frontend | `frontend/src/` |
-| ML Engine | `ml-engine/src/` |
-| Training Scripts | `ml-engine/scripts/` |
-| Trained Models | `ml-engine/models/trained/` |
-| GitHub Actions | `.github/workflows/` |
-| Skills | `.claude/skills/` |
+| Backend (prod) | `pi1:~/guardquote-deno/server.ts` |
+| Docs | `docs/` |
+| Roadmap | `docs/ROADMAP.md` |
+| Team Tasks | `docs/TEAM-TASKS.md` |
 
-### Servers
+## Servers
 
-| Server | IP | User | Password | Role |
-|--------|-----|------|----------|------|
-| Pi1 | 192.168.2.70 | johnmarston | 481526 | Database, Monitoring |
-| Pi0 | 192.168.2.101 | rafaeljg | adm1npassw0rD | GitHub Actions Runner |
+| Server | IP | User | Role |
+|--------|-----|------|------|
+| pi1 | 192.168.2.70 | johnmarston | API, Database, Monitoring |
+| pi0 | 192.168.2.101 | rafaeljg | Logs, LDAP, Syslog |
+| PA-220 | 192.168.2.14 | admin | Firewall |
+| UDM | 192.168.2.1 | rafaeljg | Router |
 
-### SSH Access
-
-```bash
-# Pi1 - Database server
-ssh pi1
-# or: sshpass -p '481526' ssh johnmarston@192.168.2.70
-
-# Pi0 - GitHub runner
-ssh pi0
-# or: sshpass -p 'adm1npassw0rD' ssh rafaeljg@192.168.2.101
-```
-
-### Database
+## SSH Access
 
 ```bash
-# Direct PostgreSQL
-psql postgresql://guardquote:WPU8bj3nbwFyZFEtHZQz@192.168.2.70:5432/guardquote
+# SSH config (~/.ssh/config)
+ssh pi0   # 192.168.2.101
+ssh pi1   # 192.168.2.70
 
-# Via PgBouncer (recommended for production)
-psql postgresql://guardquote:WPU8bj3nbwFyZFEtHZQz@192.168.2.70:6432/guardquote
+# With password
+sshpass -p '481526' ssh johnmarston@192.168.2.70
 ```
 
-### Redis
+## Database
 
 ```bash
-redis-cli -h 192.168.2.70 -a guardquote_redis_2024
+# On pi1
+PGPASSWORD=guardquote123 psql -h 127.0.0.1 -U postgres -d guardquote
+
+# Tables: users, clients, quotes, blog_posts, blog_comments, feature_requests
 ```
 
-## ML Pipeline
+## API Endpoints
 
-### Ingest Training Data
-When user provides Gemini/AI output, use the ingest skill:
-1. Parse the spec (SQL, markdown, CSV, or prose)
-2. Map columns to schema
-3. Generate training data
-4. Load into PostgreSQL
-
-```bash
-cd ml-engine
-source .venv/bin/activate
-python scripts/generate_training_data_2026.py
-```
-
-### Train Models
-```bash
-python scripts/train_models.py
-```
-
-### Current Training Data
-- **Table:** `ml_training_data_2026`
-- **Records:** 1,100
-- **Features:** 15 (event_type, location_risk, guards, etc.)
-- **Targets:** price, accepted, satisfaction
-
-## CI/CD
-
-### GitHub Actions Workflows
-
-| Workflow | File | Trigger | Runner |
-|----------|------|---------|--------|
-| PR Check | `pr-check.yml` | PR/Push | ubuntu-latest |
-| ML Training | `train-ml.yml` | Weekly/Manual | Pi0 (self-hosted) |
-| Integration | `integration.yml` | Push to main | Pi0 (self-hosted) |
-| Test Runner | `test-runner.yml` | Manual | Pi0 (self-hosted) |
-
-### GitHub Secrets
-
-| Secret | Value |
-|--------|-------|
-| `PI1_DB_PASSWORD` | WPU8bj3nbwFyZFEtHZQz |
-| `PI1_REDIS_PASSWORD` | guardquote_redis_2024 |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/status` | Health check |
+| POST | `/api/auth/login` | Admin login |
+| GET | `/api/quotes` | List quotes |
+| GET | `/api/features` | Feature requests |
+| POST | `/api/features/:id/vote` | Vote on feature |
+| POST | `/api/features/sync-github-all` | Sync to GitHub |
+| GET | `/api/blog-posts` | Blog posts |
+| GET | `/api/admin/stats` | Dashboard stats |
 
 ## Development
 
-### Start All Services
+### Frontend
 ```bash
-# Terminal 1: Backend
-cd backend && bun run --watch src/index.ts
-
-# Terminal 2: Frontend
-cd frontend && bun run dev
-
-# Terminal 3: ML Engine (optional)
-cd ml-engine && source .venv/bin/activate && uvicorn src.main:app --reload --port 8000
+cd frontend
+npm install
+npm run dev    # http://localhost:5173
+npm run build  # Build to dist/
 ```
 
-### Run Tests
+### Deploy Frontend
 ```bash
-# Backend
-cd backend && bun test
-
-# ML Engine
-cd ml-engine && pytest tests/
+npm run build
+npx wrangler pages deploy dist --project-name=guardquote
 ```
+
+### Backend (on pi1)
+```bash
+ssh pi1
+cd ~/guardquote-deno
+deno run -A server.ts
+```
+
+## Team
+
+| Member | Role |
+|--------|------|
+| Rafa | Lead Dev / Infrastructure |
+| Milkias | Documentation / PM |
+| Isaiah | SIEM / Security |
+| Xavier | Presentations |
+
+## Milestones
+
+| Milestone | Date |
+|-----------|------|
+| UAT Round 1 | Feb 14, 2026 |
+| UAT Round 2 | Feb 19, 2026 |
+| Presentation Ready | Feb 28, 2026 |
 
 ## Version
-- **Current:** v2.3.0
-- **Last Updated:** January 15, 2026
+- **Current:** v3.0.0
+- **Last Updated:** February 6, 2026

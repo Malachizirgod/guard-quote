@@ -31,7 +31,7 @@ The `master` branch is protected. All changes must go through pull requests.
 
 5. **Wait for review**
    - CI must pass (lint, build, tests)
-   - Code owner (John) must approve
+   - Code owner (Rafa) must approve
    - Address any feedback
 
 ## What NOT to do
@@ -54,7 +54,7 @@ If you think we should change any of these, open an issue first to discuss.
 
 ## Getting Help
 
-- Questions? Ask John (john@vandine.us)
+- Questions? Ask Rafa (rafael.garcia.contact.me@gmail.com)
 - Found a bug? Open an issue
 - Feature idea? Open an issue first
 
