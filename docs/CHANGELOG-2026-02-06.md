@@ -164,4 +164,42 @@ backend/package-lock.json              # Regenerated for CI
 
 ---
 
-*Generated: 2026-02-06 20:10 PST*
+---
+
+## 🖥️ Nettools Bastion (Evening Session)
+
+### Deployed: nettools.vandine.us
+- **Container:** nicolaka/netshoot:latest on pi0
+- **Terminal:** ttyd web terminal on port 7681
+- **Auth:** LDAP-based login (terminal prompt, not browser popup)
+- **Tunnel:** Cloudflare Tunnel via pi1
+
+### Features
+- LDAP authentication against OpenLDAP
+- Role-based access control (admin/security/developer)
+- Pre-configured SSH access to pi0/pi1
+- Database access (PostgreSQL) based on role
+- Network tools: nmap, mtr, tcpdump, iperf3
+- Quick commands: check-services, db-stats, prom-targets
+
+### Team Access
+| User | Role | SSH | Database |
+|------|------|-----|----------|
+| rafaeljg | admin | All | Full CRUD |
+| isaiah | security | pi0, pi1 | Read-only |
+| milkias | developer | pi1 | Read-only |
+| xavier | developer | pi1 | Read-only |
+
+### Infrastructure Fixes
+- PostgreSQL now listening on 0.0.0.0:5432 (was localhost)
+- UFW opened port 7681 on pi0
+- Cloudflare tunnel config updated on pi1
+
+### Xavier Role Upgrade
+- Promoted from Liaison to Developer
+- Now has SSH access to pi1
+- Database read access enabled
+
+---
+
+*Generated: 2026-02-06 21:40 PST*
