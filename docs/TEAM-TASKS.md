@@ -22,7 +22,7 @@ We moved **off AWS entirely**. New architecture:
 
 ## 👥 Team Roles
 
-### Rafa — Infrastructure & Development
+### Rafa ([@jag18729](https://github.com/jag18729)) — Infrastructure & Development
 - App development (frontend + backend)
 - CI/CD pipelines
 - ML model integration
@@ -30,14 +30,14 @@ We moved **off AWS entirely**. New architecture:
 - Networking & infrastructure
 - Review and consolidate all deliverables
 
-### Milkias — Documentation & Project Management
+### Milkias ([@Malachizirgod](https://github.com/Malachizirgod)) — Documentation & Project Management
 - Documentation updates
 - Project management (GitHub Projects)
 - Presentation updates
 - Procedure documentation
 - IAM writeups
 
-### Isaiah — Security Operations
+### Isaiah ([@ibernal1815](https://github.com/ibernal1815)) — Security Operations
 - SIEM setup (Wazuh)
 - Bastion host configuration
 - Detection rules & alerts

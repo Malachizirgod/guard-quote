@@ -121,12 +121,12 @@ deno run -A server.ts
 
 ## Team
 
-| Member | Role |
-|--------|------|
-| Rafa | Lead Dev / Infrastructure |
-| Milkias | Documentation / PM |
-| Isaiah | SIEM / Security |
-| Xavier | Presentations |
+| Member | GitHub | Role |
+|--------|--------|------|
+| Rafa | @jag18729 | Lead Dev / Infrastructure |
+| Milkias | @Malachizirgod | Documentation / PM |
+| Isaiah | @ibernal1815 | SIEM / Security |
+| Xavier | TBD | Presentations |
 
 ## Milestones
 
