@@ -39,18 +39,19 @@ We moved **off AWS entirely**. New architecture:
 - IAM procedure writeups
 
 ### Isaiah ([@ibernal1815](https://github.com/ibernal1815)) — Security Operations
-- SIEM setup (Wazuh)
-- Bastion host configuration
+- SIEM setup (Elastic Stack — Elasticsearch, Logstash, Kibana)
+- Bastion host (his own infrastructure)
 - Detection rules & alerts
 - Security dashboards
 - IDS/IPS integration
 
-### Xavier ([@xan942](https://github.com/xan942)) — Frontend & Documentation
-- **UI/UX:** Frontend improvements, styling, responsiveness
-- **User Acceptance Testing:** End-to-end workflow testing
-- **Documentation:** Presentations, timeline, cost analysis
-- Test client-facing features (quote flow, form validation)
-- Report bugs and UX issues
+### Xavier ([@xan942](https://github.com/xan942)) — UX Lead & UAT Driver
+- **UX/UI Champion:** User experience, design feedback, "does this feel right?"
+- **User Acceptance Testing:** Drives UAT — tests like a real user, not a developer
+- **Presentations:** Slide decks, demos, making us look good
+- **Documentation:** User-facing docs, flow diagrams, cost analysis
+- Represents the customer perspective in all decisions
+- Reports bugs, friction points, and "this is confusing" moments
 
 ---
 
