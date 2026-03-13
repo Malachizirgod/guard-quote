@@ -63,11 +63,11 @@ ML-powered security service quoting platform. Self-hosted on Raspberry Pi cluste
 ## Critical Infrastructure Notes
 
 ### DATABASE_URL
-Must use Pi1's Tailscale IP — PA-220 blocks direct Pi2→Pi1 cross-zone:
+Must use Pi1's Tailscale IP — PA-220 blocks direct Pi2→Pi1 cross-zone. Credentials in `.env`.
+Stored in K8s secret:
+```bash
+kubectl get secret guardquote-secrets -n guardquote -o jsonpath='{.data.database-url}' | base64 -d
 ```
-postgresql://postgres:<pw>@100.77.26.41:5432/guardquote
-```
-Stored in K8s secret: `kubectl get secret guardquote-secrets -n guardquote`
 
 ### OAuth Proxy
 K3s pods have no internet egress. OAuth flows via proxy on ThinkStation:

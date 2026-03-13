@@ -59,7 +59,8 @@ kubectl rollout status deployment/guardquote-backend -n guardquote
 
 ```bash
 # Example: update DATABASE_URL
-NEW_URL="postgresql://postgres:<pw>@100.77.26.41:5432/guardquote"
+NEW_URL="$(kubectl get secret guardquote-secrets -n guardquote -o jsonpath='{.data.database-url}' | base64 -d)"
+# Or set manually — see DATABASE_URL in .env
 kubectl patch secret guardquote-secrets -n guardquote \
   --type='json' \
   -p="[{\"op\":\"replace\",\"path\":\"/data/database-url\",\"value\":\"$(echo -n "$NEW_URL" | base64 -w0)\"}]"
@@ -123,11 +124,11 @@ See `docs/runbooks/NETWORKING.md` for full details.
 
 ## DATABASE_URL
 
-```
-postgresql://postgres:<pw>@100.77.26.41:5432/guardquote
-```
+Stored in the `guardquote-secrets` K8s secret. **Must use Pi1's Tailscale IP** — never the direct LAN IP. PA-220 blocks direct Pi2→Pi1.
 
-**Must use Pi1 Tailscale IP** — never `192.168.20.10`. PA-220 blocks direct Pi2→Pi1.
+```bash
+kubectl get secret guardquote-secrets -n guardquote -o jsonpath='{.data.database-url}' | base64 -d
+```
 
 Also requires on Pi1:
 ```bash

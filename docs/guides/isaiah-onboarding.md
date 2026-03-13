@@ -157,8 +157,8 @@ cd frontend && bun install && bun run dev
 # Check GuardQuote health
 curl https://guardquote.vandine.us/api/health
 
-# Wazuh API (from Pi2)
-curl -k -u wazuh-admin:VandineWazuh2026! https://localhost:55000/
+# Wazuh API (from Pi2) — credentials in .env (ask Rafael)
+curl -k -u wazuh-admin:<password> https://localhost:55000/
 
 # Suricata rules count on RV2
 ssh rafaeljg@100.118.229.114 "grep -c '^alert' /var/lib/suricata/rules/suricata.rules"
