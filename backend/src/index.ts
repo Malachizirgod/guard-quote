@@ -1395,6 +1395,9 @@ app.get("/api/auth/callback/:provider", async (c) => {
     }
   }
 
+  // Update last_login
+  await sql`UPDATE users SET last_login = NOW() WHERE id = ${user.id}`.catch(() => {});
+
   // Import createToken from auth service
   const { createToken } = await import("./services/auth");
 
@@ -1635,7 +1638,7 @@ app.get("/api/admin/users", async (c) => {
   if (auth instanceof Response) return auth;
   if (DEMO_MODE) return c.json(DEMO_USERS);
   const users = await sql`
-    SELECT id, email, first_name, last_name, role, is_active, created_at, updated_at
+    SELECT id, email, first_name, last_name, role, is_active, created_at, updated_at, last_login
     FROM users ORDER BY created_at DESC
   `;
   return c.json(users);
