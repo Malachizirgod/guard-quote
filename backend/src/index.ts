@@ -66,6 +66,8 @@ app.get("/health", async (c) => {
   });
 });
 
+app.get("/live", (c) => c.json({ status: "ok" }));
+
 app.get("/api/health", async (c) => {
   const dbOk = await testConnection();
   return c.json({
