@@ -179,8 +179,8 @@ const techStack = {
     items: [
       { name: "FastAPI", desc: "Python async API framework" },
       { name: "scikit-learn", desc: "ML model training" },
-      { name: "GradientBoost", desc: "Price regression (R²=0.93)" },
-      { name: "RandomForest", desc: "Risk classification (81%)" },
+      { name: "GradientBoost", desc: "Price regression (R²=0.932)" },
+      { name: "HistGradientBoosting", desc: "Risk classification (86.8%)" },
       { name: "gRPC/Protobuf", desc: "Binary RPC protocol" },
     ]
   },
@@ -408,7 +408,7 @@ export default function TechStack() {
               System Architecture
             </h2>
             <a 
-              href="https://htmlpreview.github.io/?https://gist.githubusercontent.com/jag18729/968ce9b880b5d7164187fa9f1a29b9b8/raw/guardquote-architecture.html"
+              href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/jag18729/guard-quote/dev/docs/architecture/guardquote-architecture.html"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-emerald-400 transition-colors"
@@ -493,12 +493,12 @@ export default function TechStack() {
             <div>
               <h3 className="text-xl font-semibold mb-2">ML-Powered Pricing Engine</h3>
               <p className="text-zinc-400 mb-4">
-                Our ML engine uses GradientBoosting and RandomForest models trained on 500+ real security service quotes.
+                Our ML engine uses GradientBoosting and HistGradientBoosting models trained on 1,100 real security service quotes.
                 Backend communicates via gRPC for low-latency inference.
               </p>
               <div className="flex flex-wrap gap-3 text-sm">
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">R² = 0.93 (price prediction)</span>
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">81% accuracy (risk classification)</span>
+                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">R² = 0.932 (price prediction)</span>
+                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">86.8% accuracy (risk classification)</span>
                 <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">&lt;50ms inference</span>
               </div>
             </div>
@@ -510,11 +510,11 @@ export default function TechStack() {
           <h2 className="text-2xl font-bold mb-8 text-center">Key Metrics</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {[
-              { value: "0.93", label: "ML R² Score" },
-              { value: "81%", label: "Risk Accuracy" },
+              { value: "0.932", label: "ML R² Score" },
+              { value: "86.8%", label: "Risk Accuracy" },
               { value: "$0", label: "Monthly Cost" },
               { value: "3", label: "OAuth Providers" },
-              { value: "48K", label: "IDS Rules" },
+              { value: "74K", label: "IDS Rules" },
               { value: "4", label: "FW Zones" },
               { value: "12ms", label: "Cold Start" },
             ].map((stat, i) => (

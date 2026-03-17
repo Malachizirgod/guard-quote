@@ -7,6 +7,7 @@ Designed to run through NordVPN for IP allowlisting.
 Usage:
     python3 log-shipper.py --config /etc/log-shipper/config.yaml
 """
+from __future__ import annotations
 
 import argparse
 import hashlib
@@ -21,9 +22,10 @@ import sys
 import threading
 import time
 from dataclasses import dataclass, asdict
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+
+from compression import zstd
 
 import requests
 import yaml
@@ -71,6 +73,7 @@ class LogShipper:
         config.setdefault('batch_timeout_seconds', 30)
         config.setdefault('retry_count', 3)
         config.setdefault('retry_delay_seconds', 5)
+        config.setdefault('compress', True)
         
         return config
     
@@ -79,39 +82,45 @@ class LogShipper:
         secret = self.config.get('webhook_secret', '').encode()
         return hmac.new(secret, payload.encode(), hashlib.sha256).hexdigest()
     
-    def _send_batch(self, logs: List[LogEntry]) -> bool:
+    def _send_batch(self, logs: list[LogEntry]) -> bool:
         """Send a batch of logs to the webhook endpoint"""
         if not logs:
             return True
             
         payload = json.dumps({
             'source': self.config.get('source_name', 'vandine-homelab'),
-            'timestamp': datetime.utcnow().isoformat() + 'Z',
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'host': os.uname().nodename,
             'count': len(logs),
             'logs': [asdict(log) for log in logs]
         })
-        
+
         signature = self._sign_payload(payload)
-        
+
         headers = {
             'Content-Type': 'application/json',
             'X-Signature': signature,
             'X-Source': self.config.get('source_name', 'vandine-homelab'),
             'User-Agent': 'VandineLogShipper/1.0'
         }
-        
+
         # Add API key if configured
         if api_key := self.config.get('api_key'):
             headers['X-API-Key'] = api_key
-        
+
+        # Compress payload with zstd if enabled
+        body = payload.encode()
+        if self.config['compress']:
+            body = zstd.compress(body)
+            headers['Content-Encoding'] = 'zstd'
+
         webhook_url = self.config['webhook_url']
-        
+
         for attempt in range(self.config['retry_count']):
             try:
                 response = requests.post(
                     webhook_url,
-                    data=payload,
+                    data=body,
                     headers=headers,
                     timeout=30
                 )
@@ -159,7 +168,7 @@ class LogShipper:
                     continue
                 
                 entry = LogEntry(
-                    timestamp=datetime.utcnow().isoformat() + 'Z',
+                    timestamp=datetime.now(timezone.utc).isoformat(),
                     host=host,
                     source=source_name,
                     severity=self._parse_severity(message),
@@ -265,7 +274,10 @@ class LogShipper:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Ship logs to SIEM webhook')
+    parser = argparse.ArgumentParser(
+        description='Ship logs to SIEM webhook',
+        suggest_on_error=True,
+    )
     parser.add_argument(
         '--config', '-c',
         default='/etc/log-shipper/config.yaml',
