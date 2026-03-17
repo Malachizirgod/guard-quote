@@ -39,10 +39,6 @@ flowchart LR
         CF[CDN + WAF]
     end
 
-    subgraph Remote["🖥️ THINKSTATION"]
-        OAuth[OAuth Proxy<br/>:9876]
-    end
-
     subgraph DC["🏢 HOMELAB — PA-220 NGFW (4 DMZ Zones)"]
         direction TB
 
@@ -80,7 +76,6 @@ flowchart LR
     FE --> BE
     BE --> ML
     BE -->|Tailscale| DB
-    BE --> OAuth
 
     IDS -.->|EVE JSON| Loki
     Wazuh -.-> Loki
@@ -88,14 +83,12 @@ flowchart LR
     Graf --- Prom
 
     classDef internet fill:#5e81ac,stroke:#4c566a,color:#eceff4
-    classDef remote fill:#88c0d0,stroke:#4c566a,color:#2e3440
     classDef infra fill:#d08770,stroke:#4c566a,color:#2e3440
     classDef app fill:#a3be8c,stroke:#4c566a,color:#2e3440
     classDef security fill:#bf616a,stroke:#4c566a,color:#eceff4
     classDef data fill:#b48ead,stroke:#4c566a,color:#2e3440
 
     class User,CF internet
-    class OAuth remote
     class DNS,LDAP,Tunnel,Graf,Prom,Loki infra
     class FE,BE,ML,Wazuh app
     class IDS security
